@@ -4,20 +4,6 @@ This document serves as the **master planning hub** for all projects, tracking s
 
 ---
 
-## ✅ Completed Projects
-
-| Project | Description | Status |
-|--------|-------------|--------|
-| **Fairweather Productions Website** | Consolidated domain: Fairweather, Sketchy Ponderings, Second Gaze | ✅ Complete |
-| **Fairweather Site Base** | Fine art business website | ✅ Complete |
-| **Sketchy Ponderings Site Base** | Minimalist poetic HTML/CSS site | ✅ Complete |
-| **Second Gaze Site Base** | Shannon's portfolio site | ✅ Complete |
-| **Cruxfade Battle System** | HTML/CSS/JS battle prototype | ✅ 1-play Complete |
-| **American Mystery Religion** | Collaborative philosophical text; printable layout | ✅ Working Web Page |
-| **Sigil Oracle** | AI Agent Oracle Page | Prompted to be a sage cat | ✅ Complete |
-
----
-
 ## 🛠 Active Projects
 
 | Project | Description | Status | Deadline | Owner | Next Action |
@@ -57,6 +43,20 @@ This document serves as the **master planning hub** for all projects, tracking s
 | Tarot cutscene scripting framework | Ripplecaster | Not started |
 | Birthday archive zine | Sketchy Ponderings | Concept |
 | Artist gift print tier | Fairweather Prints | Concept |
+
+---
+
+## ✅ Completed Projects
+
+| Project | Description | Status |
+|--------|-------------|--------|
+| **Fairweather Productions Website** | Consolidated domain: Fairweather, Sketchy Ponderings, Second Gaze | ✅ Complete |
+| **Fairweather Site Base** | Fine art business website | ✅ Complete |
+| **Sketchy Ponderings Site Base** | Minimalist poetic HTML/CSS site | ✅ Complete |
+| **Second Gaze Site Base** | Shannon's portfolio site | ✅ Complete |
+| **Cruxfade Battle System** | HTML/CSS/JS battle prototype | ✅ 1-play Complete |
+| **American Mystery Religion** | Collaborative philosophical text; printable layout | ✅ Working Web Page |
+| **Sigil Oracle** | AI Agent Oracle Page, Prompted to be a sage cat | ✅ Complete |
 
 ---
 
