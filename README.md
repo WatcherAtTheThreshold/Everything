@@ -15,10 +15,6 @@ The Larger Plan (Streamlined)
 | **Framing Paintings** | Handmade wooden frames for completed works | Build frames for current pieces |
 | **Review Cycle** | Monthly or Quarterly project + task audit | See Focus Rules below |
 
-----------|-------------|---------------|
-| **The Next Painting** | Shans acrylic and my oil paintings | Our Paintings |
-| **Framing Paintings** | Handmade wooden frames for completed works | Build frames for current pieces |
-
 ---
 
 ## 🔥 Active Projects (Max 3)
@@ -35,6 +31,7 @@ The Larger Plan (Streamlined)
 | Project | Description | Status | Move to Active When |
 |--------|-------------|--------|---------------------|
 | **Card Pull** | Tarot 1 or 3 Card Tarot Pull | In Dev | Fairweather Prints complete |
+| **Top Nav on Fairweather Site** | Top nav different sizes on dif pages | In Dev | when time presents itself :) |
 
 ---
 
