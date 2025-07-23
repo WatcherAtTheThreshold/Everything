@@ -10,7 +10,7 @@ This document serves as the **master planning hub** for all projects, tracking s
 |--------|-------------|--------|----------|--------|-------------|
 | **Fairweather Prints** | Matted Giclee prints, hand-packaged with extras | Testing | Sep 2025 | Jessop + Shannon | Select 3 SKUs and finalize insert design |
 | **Card Pull** | Tarot 1 or 3 Card Tarot Pull | In Dev | Aug 2025 | Jessop | Shan's Evil Eye Paintings |
-| **AMR – The Book** | Print-ready version of AMR site content | Drafting | Fall 2025 | Jessop | Lock text, finalize layout, prep for print |
+| **AMR – The Book** | Print-ready version of AMR site content | Drafting | Next Year | Jessop | Lock text, finalize layout, prep for print |
 | **Ripplecaster** | Tarot-like HTML game mechanic | In Dev | Aug 2025 | Jessop | Finalize card logic and cutscene flow |
 
 ---
