@@ -11,6 +11,8 @@ This document serves as the **master planning hub** for all projects, tracking s
 
 | Project | Description | Status | Deadline | Owner | Next Action |
 |--------|-------------|--------|----------|--------|-------------|
+| **The Next Painting** | Shans acrylic and my oil paintings | Paint | Ongoing | Jessop + Shannon | Our Paintings |
+| **Framing Paintings** | Shans acrylic and my oil paintings | Biuld | Ongoing | Jessop | Handmade Wooden Frames |
 | **Fairweather Prints** | Matted Giclee prints, hand-packaged with extras | Testing | Sep 2025 | Jessop + Shannon | Select 3 SKUs and finalize insert design |
 | **Card Pull** | Tarot 1 or 3 Card Tarot Pull | In Dev | Aug 2025 | Jessop | Shan's Evil Eye Paintings |
 | **AMR – The Book** | Print-ready version of AMR site content | Drafting | Next Year | Jessop | Lock text, finalize layout, prep for print |
