@@ -21,6 +21,7 @@ This document serves as the **master planning hub** for all projects, tracking s
 |--------|-------------|--------|---------------|-------|
 | **Musings Page** | Multimedia replacement for Sketchy’s “Storys” page | Concept | Q4 2025 | Potential hub for bonus content |
 | **Music Maker Pages** | HTML/CSS/JS 8-Bit Beatmaker and Pro EDM Maker | Concept | TBD | Not Quite Right |
+| **RedBubble/Society 6** | Update with current work | In Dev | Maybe next year :) | Jessop | Make it make sense |
 | **Cruxfade Narrative (Myth)** | Cruxflare mythos and identity arc | Concept | TBD | Awaiting format decision (game/book/cutscene) |
 | **A Murder Is About** | Godot prototype: chickadee and flying scene | Archived | N/A | Early prototype, not in pipeline |
 | **Addiction Project** | Reflection on substances and dependence | Concept | TBD | May fold into a future narrative |
