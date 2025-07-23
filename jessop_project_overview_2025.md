@@ -22,8 +22,8 @@ _A structured breakdown of all known projects: active, completed, on hold, and e
 |--------|-------------|----------------|
 | **Ripplecaster** | Tarot-like HTML project with narrative gamification | Cutscene structure, interaction design |
 | **Fairweather Productions Website** | Consolidates Fairweather, Sketchy Ponderings, Second Gaze into one domain | Folder structure, DNS + GitHub Pages setup |
-| **Fairweather Prints** | Matted Giclee prints, hand packaged with accoutrements, maybe numbered and signed |
-
+| **Fairweather Prints** | Matted Giclee prints, hand packaged with accoutrements, maybe numbered and signed | in physical product testing phase |
+| **American Mystery Religion - The Book** | Book version of the Website | working |
 ---
 
 ## ⚙️ On Hold / Experimental
