@@ -64,6 +64,8 @@ This document serves as the **master planning hub** for all projects, tracking s
 
 ---
 
+
+
 # 🏡 Jessop Home Projects Tracker — Master Workspace (2025)
 
 This document tracks ongoing and upcoming house-related projects: repairs, improvements, maintenance, and dream upgrades.
