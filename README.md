@@ -7,16 +7,6 @@ The Larger Plan (Streamlined)
 
 ---
 
-## 🎨 Ongoing Creative Practices
-
-| Practice | Description | Current Focus |
-|----------|-------------|---------------|
-| **The Next Painting** | Shans acrylic and my oil paintings | Our Paintings |
-| **Framing Paintings** | Handmade wooden frames for completed works | Build frames for current pieces |
-| **Review Cycle** | Monthly or Quarterly project + task audit | See Focus Rules below |
-
----
-
 ## 🔥 Active Projects (Max 3)
 
 | Project | Description | Status | Deadline | Owner | Next Action |
@@ -26,12 +16,28 @@ The Larger Plan (Streamlined)
 
 ---
 
+## ⚡ Quick Tasks (Weekend Jobs, Not Projects)
+
+- [ ] **Caulk Main Bathroom** - Re-caulk bathroom tiles and tub edge
+- [ ] Purchase silicone caulk and prep area
+- [ ] **Top Nav on Fairweather Site** - Top nav different sizes on dif pages
+
+---
+
 ## 📋 Next Up (Ready but waiting their turn)
 
 | Project | Description | Status | Move to Active When |
 |--------|-------------|--------|---------------------|
 | **Card Pull** | Tarot 1 or 3 Card Tarot Pull | In Dev | Fairweather Prints complete |
-| **Top Nav on Fairweather Site** | Top nav different sizes on dif pages | In Dev | when time presents itself :) |
+
+---
+
+## 🎨 Ongoing Creative Practices
+
+| Practice | Description | Current Focus |
+|----------|-------------|---------------|
+| **The Next Painting** | Shans acrylic and my oil paintings | Our Paintings |
+| **Framing Paintings** | Handmade wooden frames for completed works | Build frames for current pieces |
 
 ---
 
@@ -50,13 +56,6 @@ The Larger Plan (Streamlined)
 | **Finish Upstairs Flooring** | Complete floor install throughout upstairs | Concept | 2026 | May need budgeting |
 | **Toddler-Friendly Porch Fixes** | Improve porch for toddler safety | Concept | After porch rebuild | Railings, barriers, safe steps |
 | **Row's Room Upgrade** | New bed and room layout improvements | Planning | TBD | Maybe extend into porch |
-
----
-
-## ⚡ Quick Tasks (Weekend Jobs, Not Projects)
-
-- [ ] **Caulk Main Bathroom** - Re-caulk bathroom tiles and tub edge
-- [ ] Purchase silicone caulk and prep area
 
 ---
 
@@ -98,10 +97,10 @@ The Larger Plan (Streamlined)
 ## 🎯 Focus Rules
 
 - **Maximum 3 Active Projects** – If you want to start something new, something else moves to "Next Up"
-- **Ongoing Practices** – Creative work that's always happening doesn’t count against project limits
+- **Ongoing Practices** – Creative work that's always happening doesn't count against project limits
 - **Decision Deadlines** – TBD projects get a decision deadline; if missed, they go to On Hold
-- **2-Week Rule** – If you haven’t touched an "Active" project in 2 weeks, move it to "Next Up"
-- **Weekend Tasks** – Small jobs (under 4 hours) aren’t projects, they’re tasks
+- **2-Week Rule** – If you haven't touched an "Active" project in 2 weeks, move it to "Next Up"
+- **Weekend Tasks** – Small jobs (under 4 hours) aren't projects, they're tasks
 - **Monthly / Quarterly Review** – Recurring check-in:
   - Review **On Hold / Future** list: Does anything need moving up? Is the Revisit Date accurate?
   - Review **Next Up**: Is the priority order still right?
@@ -109,5 +108,6 @@ The Larger Plan (Streamlined)
   - Trim the **Ideas & Wishlist** section if items have become irrelevant or have evolved
   - Reflect on whether current Active Projects still align with larger creative or personal goals
 
+---
 
 _Last updated: 2025-07-23_
