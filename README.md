@@ -31,7 +31,7 @@ The Larger Plan (Streamlined)
 
 | Project | Description | Status | Move to Active When |
 |--------|-------------|--------|---------------------|
-| **Fairweather Sales Page** | Print Sales Page | In Dev | Fairweather Prints complete |
+| **Fairweather Sales Page** | Web Page to sell prints! | In Dev | Fairweather Prints complete |
 | **Card Pull** | Tarot 1 or 3 Card Tarot Pull | In Dev | Fairweather sales page is up |
 
 ---
