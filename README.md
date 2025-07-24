@@ -12,7 +12,7 @@ The Larger Plan (Streamlined)
 | Project | Description | Status | Deadline | Owner | Next Action |
 |--------|-------------|--------|----------|--------|-------------|
 | **Fairweather Prints** | Matted Giclee prints, hand-packaged with extras | Testing | August 2025 | Jessop + Shannon | Select 3 SKUs and finalize insert design |
-| **Porch Rebuild** | Remove or rebuild porch, possibly smaller footprint | In Progress | TBD | Jessop | **Decision deadline: Aug 15th** |
+| **Porch Rebuild** | Remove or rebuild porch, possibly smaller footprint | In Progress | TBD | Jessop | **Call A&P's 603-837-9113** |
 
 ---
 
