@@ -18,12 +18,12 @@ The Larger Plan (Streamlined)
 
 ## ⚡ Quick Tasks (Weekend Jobs, Not Projects)
 
-- [ ] **Invest - Stockmarket Plan** - Re-visit plan - 
+- [ ] - **Invest - Stockmarket Plan** - Re-visit plan - 
       [ ] Put Markdown file plan in 'Everything' Repo
-- [ ] **Caulk Main Bathroom** - Re-caulk bathroom tiles and tub edge
+- [ ] - **Caulk Main Bathroom** - Re-caulk bathroom tiles and tub edge
       [x] Purchase silicone caulk [ ] prep area
-- [ ] **Top Nav on Fairweather Site** - Top nav different sizes on dif pages on some small mobile screens
-- [ ] **New Stool for Bronwyn** - Pine, shaped like what she had now but with no top bar
+- [ ] - **Top Nav on Fairweather Site** - Top nav different sizes on dif pages on some small mobile screens
+- [ ] - **New Stool for Bronwyn** - Pine, shaped like what she had now but with no top bar
 
 ---
 
