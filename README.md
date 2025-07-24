@@ -19,9 +19,9 @@ The Larger Plan (Streamlined)
 ## ⚡ Quick Tasks (Weekend Jobs, Not Projects)
 
 - [ ] - **Invest - Stockmarket Plan** - Re-visit plan - 
-      [ ] Put Markdown file plan in 'Everything' Repo
+      - [ ] Put Markdown file plan in 'Everything' Repo
 - [ ] - **Caulk Main Bathroom** - Re-caulk bathroom tiles and tub edge
-      [x] Purchase silicone caulk [ ] prep area
+      - [x] Purchase silicone caulk [ ] prep area
 - [ ] - **Top Nav on Fairweather Site** - Top nav different sizes on dif pages on some small mobile screens
 - [ ] - **New Stool for Bronwyn** - Pine, shaped like what she had now but with no top bar
 
@@ -49,6 +49,7 @@ The Larger Plan (Streamlined)
 
 | Project | Description | Status | Revisit Date | Notes |
 |--------|-------------|--------|---------------|-------|
+| **Fairweather Prints** | maybe wooden crates to hold prints | Concept | September 2025 | **Make Plan** talk to Mellisa about it |
 | **AMR – The Book** | Print-ready version of AMR site content | Drafting | 2026 | Text needs to be locked first |
 | **Ripplecaster** | Tarot-like HTML game mechanic | In Dev | Q4 2025 | After Card Pull ships |
 | **Electrical Raceway Tubing** | Install tubing in Row's room, living room, porch | Planning | After porch decision | Depends on porch rebuild outcome |
