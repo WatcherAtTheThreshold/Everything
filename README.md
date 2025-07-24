@@ -79,7 +79,7 @@ The Larger Plan (Streamlined)
 | Downstairs Studio Shower | Bathroom | Would increase utility for studio |
 | Optimize Studio/Bedroom | Downstairs | Better separation or layout |
 | Japanese-style Garden | Yard | Pavers, plants, meditative walking space |
-| Tarot cutscene scripting framework | Ripplecaster | For when Ripplecaster becomes active |
+| Ripplecaster | Games | Tarot cutscene scripting framework From Tarot Pull Page |
 | Birthday archive zine | Sketchy Ponderings | Concept |
 | Artist gift print tier | Fairweather Prints | Concept |
 
@@ -93,6 +93,7 @@ The Larger Plan (Streamlined)
 | **Fairweather Site Base** | Fine art business website | ✅ Complete |
 | **Sketchy Ponderings Site Base** | Jessop's Mixed-Media Porfolio site | ✅ Complete |
 | **Second Gaze Site Base** | Shannon's portfolio site | ✅ Complete |
+| **Tarot Pull Base** | Second Gaze Page - 1 or 3 card pull & flip | ✅ Complete |
 | **Cruxfade Battle System** | HTML/CSS/JS battle prototype | ✅ 1-play Complete |
 | **American Mystery Religion** | Collaborative philosophical text; printable layout | ✅ Working Web Page |
 | **Sigil Oracle** | AI Agent Oracle Page, Prompted to be a sage cat | ✅ Complete |
