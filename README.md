@@ -31,7 +31,8 @@ The Larger Plan (Streamlined)
 
 | Project | Description | Status | Move to Active When |
 |--------|-------------|--------|---------------------|
-| **Card Pull** | Tarot 1 or 3 Card Tarot Pull | In Dev | Fairweather Prints complete |
+| **Fairweather Sales Page** | Print Sales Page | In Dev | Fairweather Prints complete |
+| **Card Pull** | Tarot 1 or 3 Card Tarot Pull | In Dev | Fairweather sales page is up |
 
 ---
 
@@ -89,11 +90,13 @@ The Larger Plan (Streamlined)
 |--------|-------------|--------|
 | **Fairweather Productions Website** | Consolidated domain: Fairweather, Sketchy Ponderings, Second Gaze | ✅ Complete |
 | **Fairweather Site Base** | Fine art business website | ✅ Complete |
-| **Sketchy Ponderings Site Base** | Minimalist poetic HTML/CSS site | ✅ Complete |
+| **Sketchy Ponderings Site Base** | Jessop's Mixed-Media Porfolio site | ✅ Complete |
 | **Second Gaze Site Base** | Shannon's portfolio site | ✅ Complete |
 | **Cruxfade Battle System** | HTML/CSS/JS battle prototype | ✅ 1-play Complete |
 | **American Mystery Religion** | Collaborative philosophical text; printable layout | ✅ Working Web Page |
 | **Sigil Oracle** | AI Agent Oracle Page, Prompted to be a sage cat | ✅ Complete |
+| **Music Page on Sketchy Ponderings** | Most new music is gathered and playable on a sleek webpage with built in player | ✅ Complete |
+| **Games Page on Sketchy Ponderings** | Most new playable games in one location | ✅ Complete |
 
 ---
 
