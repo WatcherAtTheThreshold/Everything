@@ -18,7 +18,7 @@ The Larger Plan (Streamlined)
 
 ## ⚡ Quick Tasks (Weekend Jobs, Not Projects)
 
-- [ ] - **Invest - Stockmarket Plan** - Re-visit plan - 
+- [ ] - **Invest - Stockmarket Plan** - Re-visit plan 
       - [ ] Put Markdown file plan in 'Everything' Repo
 - [ ] - **Caulk Main Bathroom** - Re-caulk bathroom tiles and tub edge
       - [x] Purchase silicone caulk [ ] prep area
