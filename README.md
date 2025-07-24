@@ -115,5 +115,26 @@ The Larger Plan (Streamlined)
   - Reflect on whether current Active Projects still align with larger creative or personal goals
 
 ---
+_
+    .     .
+     /   \_/   \
+   (     (_)     )
+     \   /|\   /
+       '  |  '
+          '
+
+Name: The Seed and the Moon
+
+Meaning:
+
+    The crescent arc cradles a hidden seed—like the On Hold projects, waiting.
+
+    The central glyph stands for aligned will (|), connection (/ and \), and emergence (’).
+
+    The parentheses embrace potential, held but not yet defined.
+
+_
+
+---
 
 _Last updated: 2025-07-24_
