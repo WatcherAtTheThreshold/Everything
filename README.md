@@ -116,12 +116,14 @@ The Larger Plan (Streamlined)
 
 ---
 _
-    .     .
+```
+       .     .
      /   \_/   \
    (     (_)     )
      \   /|\   /
        '  |  '
           '
+```
 
 Name: The Seed and the Moon
 
