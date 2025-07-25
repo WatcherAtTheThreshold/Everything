@@ -134,11 +134,11 @@ Name:
 
 Meaning:
 
-    The crescent arc cradles a hidden seed—like the On Hold projects, waiting.
+      The crescent arc cradles a hidden seed—like the On Hold projects, waiting.
 
-    The central glyph stands for aligned will (|), connection (/ and \), and emergence (’).
+      The central glyph stands for aligned will (|), connection (/ and \), and emergence (’).
 
-    The parentheses embrace potential, held but not yet defined.
+      The parentheses embrace potential, held but not yet defined.
 
 _
 
