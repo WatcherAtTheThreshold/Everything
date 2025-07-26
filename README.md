@@ -11,8 +11,8 @@ The Larger Plan (Streamlined)
 
 | Project | Description | Status | Deadline | Owner | Next Action |
 |--------|-------------|--------|----------|--------|-------------|
-| **Fairweather Prints** | Matted Giclee prints, hand-packaged with extras | Testing | August 2025 | Jessop + Shannon | Select 3 SKUs and finalize insert design |
-| **Fairweather Prints - Stickeers** | Stickers for protective sleeve and shipping envelope | Testing | August 2025 | Jessop + Shannon | Finalize insert design |
+| **Fairweather Prints** | Matted Giclee prints, hand-packaged with extras | Testing | August 2025 | Jessop + Shannon | 2 SKUs and finalize insert design |
+| **Fairweather Prints - Stickers & Certificate** | Stickers for protective sleeve and mailer & Cert. of Auth. for signed prints | Testing | August 2025 | Jessop + Shannon | Finalize insert design |
 | **Porch Rebuild** | Remove or rebuild porch, possibly smaller footprint | In Progress | TBD | Jessop | **Call A&P's 603-837-9113** |
 
 ---
