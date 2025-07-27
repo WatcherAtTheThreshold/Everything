@@ -100,6 +100,7 @@ The Larger Plan (Streamlined)
 | **Sigil Oracle** | AI Agent Oracle Page, Prompted to be a sage cat | ✅ Complete |
 | **Music Page on Sketchy Ponderings** | Most new music is gathered and playable on a sleek webpage with built in player | ✅ Complete |
 | **Games Page on Sketchy Ponderings** | Most new playable games in one location | ✅ Complete |
+| **Chess Page on Sketchy Ponderings** | Single Player Vs ai opponent Chess | ✅ Complete |
 
 ---
 
@@ -144,4 +145,4 @@ _
 
 ---
 
-_Last updated: 2025-07-25_
+_Last updated: 2025-07-27_
