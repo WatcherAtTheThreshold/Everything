@@ -2,7 +2,7 @@
 
 ## **The Spectrum of Sensitivity & Regulation**
 
-*A way to see yourself without shame or labels.*
+
 
 ---
 
