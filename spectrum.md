@@ -1,10 +1,8 @@
-Alright — here’s a **gentle, non-diagnostic framework** that takes your “man of nothing” stance and wraps it in something people can recognize and work with, without turning it into a pathologizing checklist.
-
 ---
 
 ## **The Spectrum of Sensitivity & Regulation**
 
-*A way to see yourself without shame or labels.*
+
 
 ---
 
@@ -74,6 +72,3 @@ Instead of telling people where they “should” be on the spectrum, you can:
 * Let others notice for themselves when their own dials are out of balance.
 
 ---
-
-If you like, I can **turn this into a one-page visual spectrum map** with the two dials, the spiral path, and the “wise empath” zone — so it feels more like a tool someone could explore without ever hearing the word “BPD.”
-That way, it’s your story in a form that also becomes a mirror for others.
