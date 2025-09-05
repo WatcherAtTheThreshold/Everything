@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Word & Name Generator</title>
+  <style>
+    :root{
+      --bg:#0f1220;--panel:#181c2f;--ink:#e8ecf3;--muted:#9aa4c7;--accent:#7dd3fc;--accent-2:#a78bfa;--ok:#34d399;--warn:#f59e0b;
+      --radius:16px;--gap:14px;--shadow:0 10px 30px rgba(0,0,0,.35)
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0; font:16px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif; color:var(--ink); background: radial-gradient(1200px 800px at 20% 10%,#11152a 0,var(--bg) 60%),linear-gradient(145deg, #0b0e1a, #0f1220)}
+    .app{max-width:1100px; margin:40px auto; padding:24px; background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(255,255,255,.00));}
+    header{display:flex; align-items:baseline; gap:12px; margin-bottom:18px}
+    h1{font-size:24px; letter-spacing:.5px; margin:0; font-weight:700}
+    .sub{color:var(--muted)}
+
+    .grid{display:grid; grid-template-columns:1.2fr 1fr; gap:var(--gap)}
+    @media (max-width:900px){.grid{grid-template-columns:1fr}}
+
+    .panel{background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02)); border:1px solid rgba(255,255,255,.08); border-radius:var(--radius); padding:18px; box-shadow:var(--shadow)}
+    .row{display:flex; gap:12px; flex-wrap:wrap}
+    label{display:grid; gap:6px; color:var(--muted); font-size:13px}
+    input[type="number"], select{background:#0e1326; color:var(--ink); border:1px solid #2b3150; border-radius:10px; padding:10px 12px; min-width:100px}
+    input[type="checkbox"]{transform:translateY(2px)}
+    .seg{display:flex; background:#0e1326; border:1px solid #2b3150; border-radius:12px; overflow:hidden}
+    .seg button{flex:1; padding:10px 14px; background:transparent; color:var(--muted); border:0; cursor:pointer}
+    .seg button.active{color:white; background:linear-gradient(180deg,#2b335c,#1c2242)}
+
+    .btn{border:0; padding:12px 16px; border-radius:12px; cursor:pointer; color:#07121b; font-weight:700}
+    .btn-primary{background:linear-gradient(180deg,#7dd3fc,#60a5fa)}
+    .btn-secondary{background:linear-gradient(180deg,#a78bfa,#60a5fa)}
+    .btn-muted{background:#1b213d; color:var(--ink); border:1px solid #2b3150}
+
+    .stack{display:grid; gap:10px}
+    .hint{color:var(--muted); font-size:12px}
+
+    textarea{width:100%; min-height:360px; resize:vertical; background:#0e1326; color:var(--ink); border:1px solid #2b3150; border-radius:12px; padding:14px}
+
+    .tag{display:inline-block; padding:6px 10px; border-radius:999px; font-size:12px; color:#0b1420; background:linear-gradient(180deg,#34d399,#10b981); font-weight:700}
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1>Word & Name Generator</h1>
+      <span class="sub">Rule‑based pseudo‑language builder</span>
+    </header>
+
+    <div class="grid">
+      <!-- Controls -->
+      <section class="panel stack" aria-label="Controls">
+        <div class="row" role="tablist" aria-label="Mode">
+          <label style="min-width:220px">
+            Mode
+            <div class="seg" id="modeSeg">
+              <button type="button" data-mode="words" class="active" aria-selected="true">Words</button>
+              <button type="button" data-mode="names">Names</button>
+            </div>
+          </label>
+          <label>
+            Count
+            <input id="count" type="number" min="1" max="200" value="20" />
+          </label>
+          <label>
+            Min syllables
+            <input id="syllMin" type="number" min="1" max="6" value="2" />
+          </label>
+          <label>
+            Max syllables
+            <input id="syllMax" type="number" min="1" max="6" value="3" />
+          </label>
+        </div>
+
+        <div class="row">
+          <label style="min-width:260px">
+            Pattern preset
+            <select id="pattern">
+              <option value="auto">Auto (mixed)</option>
+              <option value="CV">CV</option>
+              <option value="CVC">CVC</option>
+              <option value="VCV">VCV</option>
+              <option value="CV(C)">CV(C)</option>
+              <option value="(C)VC">(C)VC</option>
+            </select>
+          </label>
+          <label>
+            Style
+            <select id="style">
+              <option value="balanced">Balanced</option>
+              <option value="soft">Soft / lyrical</option>
+              <option value="hard">Hard / techy</option>
+              <option value="elven">Elven‑ish</option>
+              <option value="dwarven">Dwarven‑ish</option>
+            </select>
+          </label>
+          <label>
+            Seed (optional)
+            <input id="seed" type="number" placeholder="random" />
+          </label>
+        </div>
+
+        <div class="row">
+          <label><input id="allowDigraphs" type="checkbox" checked /> Allow digraphs</label>
+          <label><input id="rareVowels" type="checkbox" /> Rare vowels (y, diphthongs)</label>
+          <label><input id="allowApostrophe" type="checkbox" /> Sprinkle apostrophes</label>
+          <label><input id="ensureVowel" type="checkbox" checked /> Ensure vowel each syllable</label>
+        </div>
+
+        <div class="row">
+          <button id="genWords" class="btn btn-primary">Generate</button>
+          <button id="genNames" class="btn btn-secondary">Generate Names</button>
+          <button id="copyBtn" class="btn btn-muted">Copy list</button>
+          <span id="copied" class="tag" style="display:none">Copied!</span>
+        </div>
+        <div class="hint">Patterns use <strong>C</strong> = consonant, <strong>V</strong> = vowel, parentheses mean optional. "Auto" mixes common templates with phonotactics.</div>
+      </section>
+
+      <!-- Output -->
+      <section class="panel stack">
+        <label>Output
+          <textarea id="out" spellcheck="false" aria-label="Generated output"></textarea>
+        </label>
+        <div class="hint">Tip: Adjust style + syllable range to shift the vibe. Names mode capitalizes and biases to open syllables.</div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+  // ---------- RNG with optional seeding ----------
+  function mulberry32(a){return function(){let t=a+=0x6D2B79F5;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296}}
+  let R=Math.random;
+  function reseed(seed){R = (typeof seed==="number" && !Number.isNaN(seed)) ? mulberry32(seed|0) : Math.random}
+  const choice=(arr)=>arr[(R()*arr.length)|0]
+  const chance=(p)=>R()<p
+
+  // ---------- Phoneme pools ----------
+  const VOWELS_BASE=['a','e','i','o','u'];
+  const VOWELS_RARE=['y','ae','ai','au','ea','ee','ei','ie','oa','oi','oo','ou','ui'];
+
+  const ONSETS_BASE=['b','c','d','f','g','h','j','k','l','m','n','p','r','s','t','v','w','y','z'];
+  const ONSETS_SOFT=['bl','br','cl','cr','dr','fl','fr','gl','gr','pl','pr','sl','sm','sn','sp','st','sw'];
+  const ONSETS_HARD=['sk','sc','sch','scr','skl','spl','spr','str','thr','tr','kr','gr'];
+  const DIGRAPHS_ON=['ch','sh','th','ph','wh','qu'];
+
+  const CODAS_BASE=['b','d','f','g','k','l','m','n','p','r','s','t','x','z'];
+  const CODAS_CLUST=['ch','sh','th','sk','st','sp','nd','nt','ng','rk','rd','rm','rn','rt','rs','ls'];
+
+  const FORBIDDEN = new Set(['jj','vv','ww','yy','qq','zh','hhh']);
+
+  function pools(style, allowDigraphs, rareV){
+    let O=[...ONSETS_BASE];
+    let C=[...CODAS_BASE];
+    let V=[...VOWELS_BASE];
+    if(allowDigraphs){ O=O.concat(DIGRAPHS_ON); C=C.concat(CODAS_CLUST); }
+    if(rareV){ V=V.concat(VOWELS_RARE); }
+    if(style==='soft' || style==='elven'){ O = O.concat(ONSETS_SOFT); C=C.concat(['l','n','r']); }
+    if(style==='hard' || style==='dwarven'){ O = O.concat(ONSETS_HARD); C=C.concat(['rk','rg','rt','rd','kt']); }
+    if(style==='elven'){ V = V.concat(['ia','io','ea','ua']); }
+    if(style==='dwarven'){ C = C.concat(['gm','gr','zz','kk']); }
+    return {O,C,V}
+  }
+
+  // ---------- Pattern helpers ----------
+  const AUTO_TEMPLATES=['CV','CVC','CV','CVC','CVC','CV','VCV','CV(C)','(C)VC'];
+
+  function realizePattern(pattern){
+    // Expand optional tokens like (C) or (V)
+    return pattern.replace(/\((C|V)\)/g, (_,t)=> chance(.55)?t:'' );
+  }
+
+  function makeSyllable(pools, pattern, ensureVowel){
+    const pat = realizePattern(pattern);
+    let out='';
+    for(const ch of pat){
+      if(ch==='C') out+= choice(pools.O);
+      else if(ch==='V') out+= choice(pools.V);
+    }
+    if(ensureVowel && !/[aeiouy]/.test(out)){
+      // inject a simple vowel if somehow none present
+      out = out + choice(['a','e','i']);
+    }
+    return out;
+  }
+
+  function sanitize(lex){
+    // avoid triple letters, disallow some clusters, compress repeats
+    if(/([a-z])\1\1/.test(lex)) return null; // triple
+    for(const bad of FORBIDDEN){ if(lex.includes(bad)) return null; }
+    // collapse weird sequences like "aaaa" -> limit doubles except for ee/oo/aa
+    lex = lex.replace(/([^eoa])\1{2,}/g,'$1$1').replace(/(.)\1{3,}/g,'$1$1');
+    // nicer apostrophes
+    lex = lex.replace(/''+/g, "'");
+    return lex;
+  }
+
+  function shapeBias(word, mode){
+    // tweak endings for names (open syllables more common)
+    if(mode==='names'){
+      if(chance(.5)){
+        word = word.replace(/(sk|st|nd|nt|rk|rd|rm|rn|rt|rs|ls|x|z)$/,'')
+      }
+      if(chance(.35) && !/[aeiouy]$/.test(word)) word += choice(['a','e','i','o']);
+      word = word.charAt(0).toUpperCase()+word.slice(1);
+    }
+    return word;
+  }
+
+  function generateOne(opts){
+    const {style, allowDigraphs, rareVowels, ensureVowel, syllMin, syllMax, pattern, mode, allowApostrophe} = opts;
+    const P = pools(style, allowDigraphs, rareVowels);
+    const sylCount = Math.max(syllMin, Math.min(syllMax, syllMin + ((R()*((syllMax-syllMin+1)))|0)) );
+    const patList = pattern==='auto' ? AUTO_TEMPLATES : [pattern];
+
+    let pieces=[];
+    for(let i=0;i<sylCount;i++){
+      const pat = choice(patList);
+      pieces.push(makeSyllable(P, pat, ensureVowel));
+    }
+    let w = pieces.join('');
+
+    // optional, tasteful apostrophes between syllables
+    if(allowApostrophe && sylCount>=2 && chance(.18)){
+      const cut = (1+((R()*(sylCount-1))|0));
+      const idx = pieces.slice(0,cut).join('').length;
+      w = w.slice(0,idx)+"'"+w.slice(idx);
+    }
+
+    w = sanitize(w);
+    if(!w || w.length<2) return generateOne(opts); // retry
+    w = shapeBias(w, mode);
+    return w;
+  }
+
+  function generateMany(opts,count){
+    const out = new Set();
+    let guard=0;
+    while(out.size<count && guard<count*20){
+      out.add(generateOne(opts));
+      guard++;
+    }
+    return [...out];
+  }
+
+  // ---------- DOM wiring ----------
+  const $ = (s)=>document.querySelector(s);
+  const modeSeg = $('#modeSeg');
+  const out = $('#out');
+  const copied = $('#copied');
+
+  function readOpts(modeOverride){
+    const style = $('#style').value;
+    const allowDigraphs = $('#allowDigraphs').checked;
+    const rareVowels = $('#rareVowels').checked;
+    const allowApostrophe = $('#allowApostrophe').checked;
+    const ensureVowel = $('#ensureVowel').checked;
+    const pattern = $('#pattern').value;
+    const syllMin = Math.max(1, parseInt($('#syllMin').value||'2',10));
+    const syllMax = Math.max(syllMin, parseInt($('#syllMax').value||'3',10));
+    const modeBtn = modeOverride || modeSeg.querySelector('button.active')?.dataset.mode || 'words';
+    const seedVal = $('#seed').value;
+    reseed(seedVal===''? undefined : Number(seedVal));
+    return {style, allowDigraphs, rareVowels, allowApostrophe, ensureVowel, pattern, syllMin, syllMax, mode: modeBtn};
+  }
+
+  function doGenerate(mode){
+    const count = Math.min(200, Math.max(1, parseInt($('#count').value||'20',10)));
+    const opts = readOpts(mode);
+    const list = generateMany(opts, count);
+    out.value = list.join('\n');
+  }
+
+  // Segmented control behavior
+  modeSeg.addEventListener('click', (e)=>{
+    const btn = e.target.closest('button'); if(!btn) return;
+    modeSeg.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+
+  document.getElementById('genWords').addEventListener('click',()=>doGenerate('words'));
+  document.getElementById('genNames').addEventListener('click',()=>{
+    // slight bias for names: 2–3 syllables by default
+    const min = $('#syllMin'); const max = $('#syllMax');
+    if(Number(min.value)>3){min.value=2} if(Number(max.value)<2){max.value=3}
+    doGenerate('names')
+  });
+
+  document.getElementById('copyBtn').addEventListener('click', async ()=>{
+    try{ await navigator.clipboard.writeText(out.value || ''); copied.style.display='inline-block'; setTimeout(()=>copied.style.display='none',1200)}catch(err){ alert('Copy failed: '+err) }
+  });
+
+  // first run
+  doGenerate('words');
+  </script>
+</body>
+</html>
