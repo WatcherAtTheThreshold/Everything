@@ -1,125 +1,136 @@
-# Everything
-The Larger Plan (Streamlined)
+# 🔥 Jessop Project Tracker — Master Workspace (2025)
 
-# 📁 Jessop Project Tracker — Master Workspace (2025)
-
-*Focused on what's actually moving forward*
+*Updated to reflect what's actually happening*
 
 ---
 
-## 🔥 Active Projects (Max 3)
+## 🎨 Live & Running
+*Currently generating work, income, or active engagement*
 
-| Project | Description | Status | Deadline | Owner | Next Action |
-|--------|-------------|--------|----------|--------|-------------|
-| **Fairweather Prints** | Matted Giclee prints, hand-packaged with extras | Testing | August 2025 | Jessop + Shannon | 2 SKUs and finalize insert design |
-| **Fairweather Prints - Stickers & Certificate** | Stickers for protective sleeve and mailer & Cert. of Auth. for signed prints | Testing | August 2025 | Jessop + Shannon | Finalize insert design |
-| **Porch Rebuild** | Remove or rebuild porch, possibly smaller footprint | In Progress | TBD | Jessop | **Call A&P's 603-837-9113** |
+### Fairweather Print Production
+**Status:** Selling at live shows  
+**What's Working:**
+- In-house printing on HP matte photo paper (62lb, acid-free, non-yellowing)
+- Art prints from yours + Shannon's paintings
+- Goddess Cards (Shannon's goddess series, matching card-pull page)
+- Bookmarks (same paper/process)
+- Full packaging: protective sleeves, bookmarks, business cards, name tags, Avery label stickers for closure
 
----
-
-## ⚡ Quick Tasks (Weekend Jobs, Not Projects)
-
-- [ ] - **Invest - Stockmarket Plan** - Re-visit plan 
-      - [ ] Put Markdown file plan in 'Everything' Repo
-- [ ] - **Caulk Main Bathroom** - Re-caulk bathroom tiles and tub edge
-      - [x] Purchase silicone caulk - [ ] prep area
-- [x] - **Top Nav on Fairweather Site** - Top nav different sizes on dif pages on some small mobile screens
-- [ ] - **New Stool for Bronwyn** - Pine, shaped like what she had now but with no top bar
-
----
-
-## 📋 Next Up (Ready but waiting their turn)
-
-| Project | Description | Status | Move to Active When |
-|--------|-------------|--------|---------------------|
-| **Fairweather Sales Page** | Web Page to sell prints! | In Dev | Fairweather Prints complete |
-| **Card Pull** | Tarot 1 or 3 Card Tarot Pull | In Dev | Fairweather sales page is up |
+**Next Phase:** Online sales infrastructure
+- [ ] Build Fairweather Sales Page on website
+- [ ] Test shipping methods and costs
+- [ ] Set up Etsy shop
+- [ ] List inventory online
 
 ---
 
-## 🎨 Ongoing Creative Practices
+## 🛠️ Building
+*Active development on new things*
 
-| Practice | Description | Current Focus |
-|----------|-------------|---------------|
-| **The Next Painting** | Shans acrylic and my oil paintings | Our Paintings |
-| **Framing Paintings** | Handmade wooden frames for completed works | Build frames for current pieces |
-
----
-
-## ⚙️ On Hold / Future Projects
-
-| Project | Description | Status | Revisit Date | Notes |
-|--------|-------------|--------|---------------|-------|
-| **Fairweather Prints** | maybe wooden crates to hold prints | Concept | September 2025 | **Make Plan** talk to Mellisa about it |
-| **AMR – The Book** | Print-ready version of AMR site content | Drafting | 2026 | Text needs to be locked first |
-| **Ripplecaster** | Tarot-like HTML game mechanic | In Dev | Q4 2025 | After Card Pull ships |
-| **Electrical Raceway Tubing** | Install tubing in Row's room, living room, porch | Planning | After porch decision | Depends on porch rebuild outcome |
-| **Musings Page** | Multimedia replacement for Sketchy's "Storys" page | Concept | Q4 2025 | Potential hub for bonus content |
-| **Music Maker Pages** | HTML/CSS/JS 8-Bit Beatmaker and Pro EDM Maker | Concept | TBD | Not Quite Right |
-| **RedBubble/Society 6** | Update with current work | In Dev | 2026 | Make it make sense |
-| **Cruxfade Narrative (Myth)** | Cruxflare mythos and identity arc | Concept | TBD | Awaiting format decision |
-| **Fix Front Screen Door** | Repair or replace screen door | On Hold | Q4 2025 | Needs measurements and new hinge |
-| **Finish Upstairs Flooring** | Complete floor install throughout upstairs | Concept | 2026 | May need budgeting |
-| **Toddler-Friendly Porch Fixes** | Improve porch for toddler safety | Concept | After porch rebuild | Railings, barriers, safe steps |
-| **Row's Room Upgrade** | New bed and room layout improvements | Planning | TBD | Maybe extend into porch |
+| Project | Description | Next Action |
+|---------|-------------|-------------|
+| **Fairweather Online Sales** | Website sales page + Etsy setup | Send test shipments, then build sales page |
 
 ---
 
-## 🧩 Emergent & Crossover Concepts
+## 🎨 Ongoing Creative Practice
+*Always happening, doesn't count against project limits*
 
-- **Gloam Knight / Artorius / Sif / Orion**: Archetypal identities across formats
-- **Cruxflare / Cruxfade**: Shadow antagonist/metaphysical concept
-- **The Listening Tree**: Reflective spiritual scene that can recur or evolve
-
----
-
-## 🧩 Ideas & Wishlist
-
-| Idea | Category | Notes |
-|------|----------|-------|
-| Downstairs Studio Shower | Bathroom | Would increase utility for studio |
-| Optimize Studio/Bedroom | Downstairs | Better separation or layout |
-| Japanese-style Garden | Yard | Pavers, plants, meditative walking space |
-| Ripplecaster | Games | Tarot cutscene scripting framework From Tarot Pull Page |
-| Birthday archive zine | Sketchy Ponderings | Concept |
-| Artist gift print tier | Fairweather Prints | Concept |
+| Practice | Current Focus |
+|----------|---------------|
+| **The Next Painting** | Shannon's acrylics + your oil paintings |
+| **Framing Paintings** | Handmade wooden frames for completed works |
 
 ---
 
-## ✅ Completed Projects
+## 🏠 Home & Life Projects
+*Non-creative maintenance and improvements*
 
-| Project | Description | Status |
-|--------|-------------|--------|
-| **Fairweather Productions Website** | Consolidated domain: Fairweather, Sketchy Ponderings, Second Gaze | ✅ Complete |
-| **Fairweather Site Base** | Fine art business website | ✅ Complete |
-| **Sketchy Ponderings Site Base** | Jessop's Mixed-Media Porfolio site | ✅ Complete |
-| **Second Gaze Site Base** | Shannon's portfolio site | ✅ Complete |
-| **Tarot Pull Base** | Second Gaze Page - 1 or 3 card pull & flip | ✅ Complete |
-| **Cruxfade Battle System** | HTML/CSS/JS battle prototype | ✅ One Battle |
-| **American Mystery Religion** | Collaborative philosophical text; printable layout | ✅ Complete |
-| **Sigil Oracle** | AI Agent Oracle Page, Prompted to be a sage cat | ✅ Complete |
-| **Music Page on Sketchy Ponderings** | Most new music is gathered and playable on a sleek webpage with built in player | ✅ Complete |
-| **Games Page on Sketchy Ponderings** | Most new playable games in one location | ✅ Complete |
-| **Chess Page on Sketchy Ponderings** | Single Player Vs ai opponent Chess | ✅ Complete |
+| Project | Status | Notes |
+|---------|--------|-------|
+| **Porch Rebuild** | On Hold | A&P went out of business, need to find new contractor |
+| **Caulk Main Bathroom** | To Do | Re-caulk bathroom tiles and tub edge - caulk purchased |
 
 ---
 
-## 🎯 Focus Rules
+## ⚡ Quick Tasks
+*Weekend jobs under 4 hours*
 
-- **Maximum 3 Active Projects** – If you want to start something new, something else moves to "Next Up"
-- **Ongoing Practices** – Creative work that's always happening doesn't count against project limits
-- **Decision Deadlines** – TBD projects get a decision deadline; if missed, they go to On Hold
-- **2-Week Rule** – If you haven't touched an "Active" project in 2 weeks, move it to "Next Up"
-- **Weekend Tasks** – Small jobs (under 4 hours) aren't projects, they're tasks
-- **Monthly / Quarterly Review** – Recurring check-in:
-  - Review **On Hold / Future** list: Does anything need moving up? Is the Revisit Date accurate?
-  - Review **Next Up**: Is the priority order still right?
-  - Ensure every **Active Project** has a clearly defined **Next Action**
-  - Trim the **Ideas & Wishlist** section if items have become irrelevant or have evolved
-  - Reflect on whether current Active Projects still align with larger creative or personal goals
+- [ ]
 
 ---
-_
+
+## 💭 Someday/Maybe
+*The dream list - here so it doesn't clutter your brain*
+
+| Project | Category | Notes |
+|---------|----------|-------|
+| **Fairweather Wooden Crates** | Product | Storage/packaging for prints - talk to Melissa |
+| **AMR — The Book** | Publishing | Print-ready version of AMR site content (2026) |
+| **Ripplecaster** | Games | Tarot-like HTML game mechanic |
+| **Electrical Raceway Tubing** | Home | Row's room, living room, porch - after porch decision |
+| **Musings Page** | Web | Multimedia replacement for Sketchy's "Storys" page |
+| **Music Maker Pages** | Web/Games | 8-Bit Beatmaker and Pro EDM Maker |
+| **RedBubble/Society 6** | Print-on-Demand | Update with current work |
+| **Cruxfade Narrative** | Creative | Cruxflare mythos and identity arc |
+| **Fix Front Screen Door** | Home | Needs measurements and new hinge |
+| **Finish Upstairs Flooring** | Home | Complete floor install (may need budgeting) |
+| **Toddler-Friendly Porch** | Home | After porch rebuild - railings, barriers, safe steps |
+| **Row's Room Upgrade** | Home | New bed and layout - maybe extend into porch |
+| **Downstairs Studio Shower** | Home | Would increase studio utility |
+| **Optimize Studio/Bedroom** | Home | Better separation or layout |
+| **Japanese-style Garden** | Yard | Pavers, plants, meditative walking space |
+| **Birthday Archive Zine** | Sketchy Ponderings | Concept |
+| **Artist Gift Print Tier** | Fairweather | Premium product concept |
+
+---
+
+## 🧩 Emergent Themes & Crossover Concepts
+*Archetypal ideas that show up across projects*
+
+- **Gloam Knight / Artorius / Sif / Orion** - Recurring archetypal identities
+- **Cruxflare / Cruxfade** - Shadow antagonist/metaphysical concept
+- **The Listening Tree** - Reflective spiritual scene that can evolve
+
+---
+
+## ✅ Complete
+*Done and working*
+
+| Project | Description |
+|---------|-------------|
+| **Fairweather Productions Website** | Consolidated domain: Fairweather, Gentle Machine, Second Gaze |
+| **Fairweather Site Base** | Fine art business website |
+| **Sketchy Ponderings Site Base** | Jessop's mixed-media portfolio site |
+| **Second Gaze Site Base** | Shannon's portfolio site |
+| **Card Pull Page** | 1 or 3 card pull & flip with newest goddess paintings and sayings |
+| **Cruxfade Battle System** | HTML/CSS/JS battle prototype (one battle complete) |
+| **American Mystery Religion** | Collaborative philosophical text, printable layout |
+| **Sigil Oracle** | AI Agent Oracle page, prompted as sage cat |
+| **Music Page** | Gathered music with built-in player on Sketchy Ponderings |
+| **Games Page** | Playable games in one location on Sketchy Ponderings |
+| **Chess Page** | Single player vs AI chess on Sketchy Ponderings |
+
+---
+
+## 🎯 How This Works
+
+**No rigid rules** — Update when it makes sense, not on a schedule.
+
+**Categories flow naturally:**
+- If you're actively doing it and it's generating results → **Live & Running**
+- If you're building something new → **Building**  
+- If it's creative work that's always happening → **Ongoing Practice**
+- If it's home/life stuff → **Home & Life Projects**
+- If it's a good idea for later → **Someday/Maybe**
+- If it's done → **Complete**
+
+**Weekend Tasks** — Small jobs (under 4 hours) live in Quick Tasks, not projects.
+
+**When to review:** When things feel cluttered, when priorities shift, or when you've got new momentum and want to capture it.
+
+---
+
 ```
        .     .
      /   \_/   \
@@ -129,20 +140,15 @@ _
           '
 ```
 
-Name: 
+**The Seed and the Moon**
 
-      The Seed and the Moon
-
-Meaning:
-
-      The crescent arc cradles a hidden seed—like the On Hold projects, waiting.
-
-      The central glyph stands for aligned will (|), connection (/ and \), and emergence (’).
-
-      The parentheses embrace potential, held but not yet defined.
-
-_
+*The crescent arc cradles a hidden seed—potential waiting.*  
+*The central glyph: aligned will (|), connection (/ and \), emergence (').*  
+*The parentheses embrace what's held but not yet defined.*
 
 ---
 
-_Last updated: 2025-07-27_
+_Last updated: December 2025_
+
+---
+
