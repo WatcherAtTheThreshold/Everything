@@ -59,21 +59,6 @@
 
 ---
 
-## ⚡ Quick Tasks
-*Weekend jobs under 4 hours*
-
-- [ ]
-
-- [ ]
-
-- [ ]
-
-- [ ]
-
-- [ ]
-
-
----
 
 ## 💭 Someday/Maybe
 *The dream list - here so it doesn't clutter your brain*
@@ -95,12 +80,31 @@
 ## 🧩 Emergent Themes & Crossover Concepts
 *Archetypal ideas that show up across projects*
 
-- **Gloam Knight / Artorius / Sif / Orion** - Recurring archetypal identities
-- **Cruxflare / Cruxfade** - Shadow antagonist/metaphysical concept
-- **Game - The Listening Tree** - Reflective spiritual scene that can evolve
-- **Higher Self - Nobody** - What to call it
----
+- [ ]
 
+- [ ]
+
+- [ ]
+
+- [ ]
+
+- [ ]
+---
+## ⚡ Quick Tasks
+*Weekend jobs under 4 hours*
+
+- [ ]
+
+- [ ]
+
+- [ ]
+
+- [ ]
+
+- [ ]
+
+
+---
 ## ✅ Complete
 *Done and working*
 
@@ -138,7 +142,18 @@
 **When to review:** When things feel cluttered, when priorities shift, or when you've got new momentum and want to capture it.
 
 ---
+## ⚡ Anything Else
+*Thouhgts, Notes, Etc.*
 
+- [ ]
+
+- [ ]
+
+- [ ]
+
+- [ ]
+
+- [ ]
 ```
        .     .
      /   \_/   \
