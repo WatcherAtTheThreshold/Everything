@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Everything Repo — Editor</title>
+
+  <!-- Toast UI Editor (Markdown + WYSIWYG) -->
+  <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
+  <link rel="stylesheet" href="app/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="dot" aria-hidden="true"></div>
+      <div class="titles">
+        <div class="title">Everything</div>
+        <div class="subtitle">Minimal editor • Markdown underneath</div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <input id="search" class="search" type="search" placeholder="Search…" autocomplete="off" />
+      <button id="btnImport" class="btn">Import</button>
+      <button id="btnExport" class="btn primary">Export README.md</button>
+      <button id="btnReset" class="btn ghost" title="Clear local draft">Reset Draft</button>
+      <input id="fileInput" type="file" accept=".md,text/markdown,text/plain" hidden />
+    </div>
+  </header>
+
+  <main class="layout">
+    <aside class="sidebar">
+      <div class="sidebarHeader">
+        <div class="sidebarTitle">Sections</div>
+        <div id="status" class="status">Loading…</div>
+      </div>
+      <nav id="sections" class="sections"></nav>
+
+      <div class="sidebarFooter">
+        <div class="hint">
+          <div><span class="kbd">Ctrl</span> + <span class="kbd">S</span> exports.</div>
+          <div>Draft autosaves locally.</div>
+        </div>
+      </div>
+    </aside>
+
+    <section class="editorPane">
+      <div id="editor" class="editor"></div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+  <script type="module" src="app/app.js"></script>
+</body>
+</html>
