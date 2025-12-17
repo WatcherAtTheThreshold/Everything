@@ -146,6 +146,7 @@
 * If you're actively doing it and it's generating results → **Live & Running**
 * If you're building something new → **Building**
 * If it's creative work that's always happening → **Ongoing Practice**
+* If it's a WIP but on hold → **WIP Creative Projects**
 * If it's home/life stuff → **Home & Life Projects**
 * If it's a good idea for later → **Someday/Maybe**
 * If it's done → **Complete**
