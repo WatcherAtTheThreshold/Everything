@@ -210,6 +210,14 @@ body{
   line-height: 1.7;
 }
 
+@media print {
+  .topbar, .sidebar, #toast { display: none !important; }
+  .layout { display: block !important; }
+  .editorPane { height: auto !important; }
+  body { background: #fff !important; }
+}
+
+
 /* Mobile-ish fallback */
 @media (max-width: 980px){
   .layout{ grid-template-columns: 1fr; height:auto; }
