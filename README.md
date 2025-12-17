@@ -69,6 +69,9 @@
 
 | Project | Status | Notes |
 | ------- | ------ | ----- |
+| **Toddler-Friendly Porch** | Home | After porch rebuild - railings, barriers, safe steps |
+| **Row's Room Upgrade** | Home | New bed and layout - maybe extend into porch |
+| **Optimize Studio/Bedroom** | Home | Better separation or layout |
 | **Porch Rebuild** | On Hold | A&P went out of business, need to find new contractor |
 | **Caulk Main Bathroom** | To Do | Re-caulk bathroom tiles and tub edge - caulk purchased |
 
@@ -84,9 +87,6 @@
 | **👾Ripplecaster** | Games | Tarot-like HTML game mechanic |
 | **Electrical Raceway Tubing** | Home | Row's room, living room, porch - after porch decision |
 | **Cruxfade Narrative** | Creative | Cruxflare mythos and identity arc |
-| **Toddler-Friendly Porch** | Home | After porch rebuild - railings, barriers, safe steps |
-| **Row's Room Upgrade** | Home | New bed and layout - maybe extend into porch |
-| **Optimize Studio/Bedroom** | Home | Better separation or layout |
 | **Artist Gift Print Tier** | Fairweather | Premium product concept |
 
 ***
