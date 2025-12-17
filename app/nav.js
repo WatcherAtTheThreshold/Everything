@@ -13,51 +13,69 @@ export function buildSectionIndex(markdown){
 }
 
 export function jumpToSection(editor, lineIndex, sectionIndex){
-  // Move cursor to the heading line using Toast UI's API
-  try{
-    // This moves the cursor to the start of the specified line (1-indexed in some versions, 0-indexed in others)
-    const pos = [lineIndex + 1, 0]; // Try 1-indexed first
-    editor.setSelection(pos, pos);
-    editor.focus();
-  }catch(err){
-    // Fallback to 0-indexed
+  const editorMode = editor.isMarkdownMode() ? 'markdown' : 'wysiwyg';
+  
+  // Only try to set cursor position in Markdown mode
+  if(editorMode === 'markdown'){
     try{
-      const pos = [lineIndex, 0];
+      const pos = [lineIndex + 1, 0];
       editor.setSelection(pos, pos);
       editor.focus();
-    }catch(err2){
-      console.warn('Could not move cursor:', err2);
+    }catch(err){
+      try{
+        const pos = [lineIndex, 0];
+        editor.setSelection(pos, pos);
+        editor.focus();
+      }catch(err2){
+        console.warn('Could not move cursor:', err2);
+      }
     }
   }
 
-  // Scroll the visible editor/preview container
+  // Scroll to the section (works in all modes)
   setTimeout(() => {
-    // Get all possible editor containers
-    const mdScrollContainer = document.querySelector('.toastui-editor-md-container .toastui-editor-md-splitter .toastui-editor-md-vertical-style .ProseMirror, .CodeMirror-scroll');
-    const wwScrollContainer = document.querySelector('.toastui-editor-ww-container .toastui-editor-ww-mode .ProseMirror');
-    const previewScrollContainer = document.querySelector('.toastui-editor-contents');
+    let activeContainer;
     
-    // Find which container is currently active/visible
-    const activeContainer = [mdScrollContainer, wwScrollContainer, previewScrollContainer]
-      .find(c => c && c.offsetParent !== null);
-    
-    if(activeContainer){
-      // Calculate approximate scroll position (each line is ~20-30px typically)
-      const estimatedScroll = lineIndex * 24;
-      activeContainer.scrollTo({
-        top: estimatedScroll,
-        behavior: 'smooth'
-      });
-      
-      // Also try to find and highlight the actual heading element
-      setTimeout(() => {
-        const headings = activeContainer.querySelectorAll('h1, h2, h3, h4');
+    if(editorMode === 'wysiwyg'){
+      // WYSIWYG mode - find the heading directly in the editor
+      activeContainer = document.querySelector('.toastui-editor-ww-container .ProseMirror');
+      if(activeContainer){
+        const headings = activeContainer.querySelectorAll('h1, h2, h3, h4, h5, h6');
         if(headings[sectionIndex]){
           headings[sectionIndex].scrollIntoView({ block: 'center', behavior: 'smooth' });
           headings[sectionIndex].classList.add('section-focus');
           setTimeout(() => headings[sectionIndex].classList.remove('section-focus'), 1200);
+          return;
         }
-      }, 150);
+      }
+    } else {
+      // Markdown mode - scroll by estimated line position
+      activeContainer = document.querySelector('.toastui-editor-md-container .CodeMirror-scroll');
+      if(activeContainer){
+        const estimatedScroll = lineIndex * 24;
+        activeContainer.scrollTo({
+          top: estimatedScroll,
+          behavior: 'smooth'
+        });
+        return;
+      }
+    }
+    
+    // Fallback: try to find any visible container
+    const containers = [
+      document.querySelector('.toastui-editor-ww-container .ProseMirror'),
+      document.querySelector('.toastui-editor-md-container .CodeMirror-scroll'),
+      document.querySelector('.toastui-editor-contents')
+    ];
+    
+    activeContainer = containers.find(c => c && c.offsetParent !== null);
+    if(activeContainer){
+      const headings = activeContainer.querySelectorAll('h1, h2, h3, h4, h5, h6');
+      if(headings[sectionIndex]){
+        headings[sectionIndex].scrollIntoView({ block: 'center', behavior: 'smooth' });
+        headings[sectionIndex].classList.add('section-focus');
+        setTimeout(() => headings[sectionIndex].classList.remove('section-focus'), 1200);
+      }
     }
   }, 100);
 }
