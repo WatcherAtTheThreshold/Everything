@@ -12,29 +12,49 @@ export function buildSectionIndex(markdown){
   return items;
 }
 
-export function jumpToSection(editor, lineIndex){
-  // Toast UI selection uses [line, ch] (0-based)
+export function jumpToSection(editor, lineIndex, sectionIndex){
+  // Move cursor to the heading line
   try{
     editor.setSelection([lineIndex, 0], [lineIndex, 0]);
     editor.focus();
-  }catch{
-    // If selection API differs in your build, this fails gracefully.
+  }catch(err){
+    console.warn('Could not set editor selection:', err);
   }
+
+  // Scroll the preview pane to the heading and highlight it
+  setTimeout(() => {
+    const editorEl = document.querySelector('.toastui-editor-contents');
+    if (!editorEl) return;
+
+    const headings = editorEl.querySelectorAll('h1, h2, h3, h4');
+    const target = headings[sectionIndex];
+    
+    if (target) {
+      target.scrollIntoView({ block: 'start', behavior: 'smooth' });
+      
+      // Visual highlight effect
+      target.classList.add('section-focus');
+      setTimeout(() => target.classList.remove('section-focus'), 1200);
+    }
+  }, 50);
 }
 
 export function highlightSearch(editor, query){
-  // Very light search: jump to first match in the Markdown text.
+  // Light search: jump to first match in the Markdown text.
   const md = editor.getMarkdown();
   const lines = md.split(/\r?\n/);
   const q = query.toLowerCase();
+  
   for(let i=0;i<lines.length;i++){
     const idx = lines[i].toLowerCase().indexOf(q);
     if(idx !== -1){
       try{
         editor.setSelection([i, idx], [i, idx + query.length]);
         editor.focus();
-      }catch{}
-      return true;
+        return true;
+      }catch(err){
+        console.warn('Could not highlight search result:', err);
+      }
     }
   }
   return false;
