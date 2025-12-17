@@ -166,19 +166,6 @@
 * [ ] 
 * [ ] 
 
-```
-       .     .
-     /   \_/   \
-   (     (_)     )
-     \   /|\   /
-       '  |  '
-          '
-```
-
-**The Seed and the Moon**
-
-*The crescent arc cradles a hidden seed—potential waiting\.The central glyph: aligned will \(\|\)\, connection \(/ and \)\, emergence \('\)\.The parentheses embrace what's held but not yet defined\.*
-
 ***
 
 *Last updated: December 2025*
