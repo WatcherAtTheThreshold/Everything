@@ -129,7 +129,7 @@
 | **Fairweather Site Base** | Fine art business website |
 | **The Gentle Machine Site Base** | Jessop's mixed-media portfolio site |
 | **Second Gaze Site Base** | Shannon's portfolio site |
-| **Card Pull Page** | 1 or 3 card pull & flip with newest goddess paintings and sayings |
+| **Card Page - The Second Gaze** | 1 or 3 card pull & flip with newest goddess paintings and sayings |
 | **American Mystery Religion** | Collaborative philosophical text, printable layout |
 | **Sigil Oracle** | AI Agent Oracle page, prompted as sage cat |
 | **Music Page** | Gathered music with built-in player on The Gentle Machine |
