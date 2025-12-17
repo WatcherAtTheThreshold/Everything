@@ -80,6 +80,21 @@ function refreshSections(markdown){
   }
 }
 
+editor.moveCursorTo(it.line, 0);
+
+// Then scroll the editor viewport
+setTimeout(() => {
+  const editorEl = document.querySelector('.toastui-editor-contents');
+  if (!editorEl) return;
+
+  const headings = editorEl.querySelectorAll('h1, h2, h3, h4');
+  const target = headings[it.index]; // see note below
+  if (target) {
+    target.scrollIntoView({ block: 'start', behavior: 'instant' });
+  }
+}, 0);
+
+
 async function init(){
   setStatus('Loading…');
 
