@@ -20,7 +20,7 @@
 * Bookmarks (same paper/process)
 * Full packaging: protective sleeves, bookmarks, business cards, name tags, Avery label stickers for closure
 
-**Next Phase:** Online sales infrastructure
+**📍 Next Phase:** Online sales infrastructure
 
 * [ ] Build Fairweather Sales Page on website
 * [ ] Test shipping methods and costs
