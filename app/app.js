@@ -45,6 +45,21 @@ function createEditor(initialMarkdown){
     }, 450);
   });
 
+const lastTouchedEl = $('#lastTouched');
+
+function setLastTouched(){
+  const d = new Date();
+  localStorage.setItem('everything_last_touched', d.toISOString());
+  if(lastTouchedEl) lastTouchedEl.textContent = `Last touched: ${d.toLocaleString()}`;
+}
+
+function loadLastTouched(){
+  const iso = localStorage.getItem('everything_last_touched');
+  if(!iso || !lastTouchedEl) return;
+  lastTouchedEl.textContent = `Last touched: ${new Date(iso).toLocaleString()}`;
+}
+
+  
   refreshSections(editor.getMarkdown());
 }
 
@@ -81,6 +96,9 @@ async function init(){
   }
 
   // Wire buttons
+  $('#btnPrint')?.addEventListener('click', () => window.print());
+
+
   $('#btnExport').addEventListener('click', () => {
     const md = editor.getMarkdown();
     exportMarkdownFile(md, 'README.md');
