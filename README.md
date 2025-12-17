@@ -6,7 +6,7 @@
 
 ***
 
-## 🎨 Live & Running
+## 💎 Live & Running
 
 *Currently generating work, income, or active engagement*
 
@@ -146,7 +146,7 @@
 
 ***
 
-## ⚡ Anything Else
+## ✒️ Anything Else
 
 *Thoughts, Notes, Etc.*
 
