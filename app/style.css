@@ -210,6 +210,11 @@ body{
   line-height: 1.7;
 }
 
+.section-focus {
+  background: rgba(0,0,0,0.04);
+  transition: background 1.2s ease;
+}
+
 @media print {
   .topbar, .sidebar, #toast { display: none !important; }
   .layout { display: block !important; }
