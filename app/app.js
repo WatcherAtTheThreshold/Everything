@@ -165,3 +165,7 @@ init().catch((err) => {
   setStatus('Error');
   toast('Error loading editor');
 });
+
+target.classList.add('section-focus');
+setTimeout(() => target.classList.remove('section-focus'), 1200);
+
