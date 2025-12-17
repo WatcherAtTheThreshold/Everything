@@ -157,7 +157,7 @@ function refreshSections(markdown){
 }
 
 async function init(){
-  setStatus('Loadingâ€¦');
+  setStatus('Loading¦');
 
   const draft = loadDraft(DRAFT_KEY);
   const initial = draft ?? await loadInitialMarkdown('./README.md');
@@ -174,7 +174,7 @@ async function init(){
   // Wire buttons
   $('#btnPrint')?.addEventListener('click', () => {
     printMarkdown(editor);
-    toast('Opening print dialogâ€¦');
+    toast('Opening print dialog¦');
   });
 
   $('#btnExport').addEventListener('click', () => {
