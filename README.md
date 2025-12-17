@@ -46,9 +46,9 @@
 
 | Practice | Current Focus |
 | -------- | ------------- |
-| **The Next Painting** | Shannon's acrylics + Jessop's oil paintings |
-| **Framing Paintings** | Handmade wooden frames for completed works |
-| **Writing - Substack** | Short stories, poems and essays |
+| **🔁 The Next Painting** | Shannon's acrylics + Jessop's oil paintings |
+| **🔁 Framing Paintings** | Handmade wooden frames for completed works |
+| **🔁 Writing - Substack** | Short stories, poems and essays |
 
 ***
 
