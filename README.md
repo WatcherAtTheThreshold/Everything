@@ -51,6 +51,16 @@
 | **🔁 Writing - Substack** | Short stories, poems and essays |
 
 ***
+## 🚧 WIP Creative Projects
+
+*unfinished projects*
+
+| What | Where you at? |
+| -------- | ------------- |
+| **Kids Games** | HTML suite of childrens games for ages 3-5 |
+| **Cruxfade-Micro** | HTML Deckcrawler - Art to be finishedw |
+
+***
 
 ## 🏠 Home & Life Projects
 
@@ -73,7 +83,6 @@
 | **AMR — The Book** | Publishing | Print-ready version of AMR site content (2026) |
 | **Ripplecaster** | Games | Tarot-like HTML game mechanic |
 | **Electrical Raceway Tubing** | Home | Row's room, living room, porch - after porch decision |
-| **Musings Page** | Web | Multimedia replacement for Sketchy's "Storys" page |
 | **Cruxfade Narrative** | Creative | Cruxflare mythos and identity arc |
 | **Toddler-Friendly Porch** | Home | After porch rebuild - railings, barriers, safe steps |
 | **Row's Room Upgrade** | Home | New bed and layout - maybe extend into porch |
@@ -112,6 +121,8 @@
 
 | Project | Description |
 | ------- | ----------- |
+| **Markdown-Edit Repo** | WYSWIG and code maekdown file importer/exporter editor |
+| **Stories Page - The Gentle Machine** | My short stories, Poems and Essays on Substack |
 | **Game - Shadows in the Deck** | HTML web card game, playable on The Gentle Machine's Games Page |
 | **Game - Rooks Gambit** | HTML web chess game, playable on The Gentle Machine's Games Page |
 | **Fairweather Productions Website** | Consolidated domain: Fairweather, Gentle Machine, Second Gaze |
