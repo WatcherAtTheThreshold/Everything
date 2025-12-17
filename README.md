@@ -57,8 +57,8 @@
 
 | What | Where you at? |
 | -------- | ------------- |
-| **👾Kids Games** | HTML suite of childrens games for ages 3-5 |
-| **👾Cruxfade-Micro** | HTML Deckcrawler - Art to be finishedw |
+| **👾Kids Games** | HTML suite of childrens games for ages 3-5, finish Art |
+| **👾Cruxfade-Micro** | HTML Deckcrawler - Finish Art |
 
 ***
 
