@@ -151,6 +151,7 @@
 * If it's a good idea for later → **Someday/Maybe**
 * If it's done → **Complete**
 
+
 **Weekend Tasks** — Small jobs (under 4 hours) live in Quick Tasks, not projects.
 
 **When to review:** When things feel cluttered, when priorities shift, or when you've got new momentum and want to capture it.
