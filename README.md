@@ -12,7 +12,7 @@
 
 ### Fairweather Print Production
 
-**Status:** Selling at live shows **What's Working:**
+**🚩 Status:** Selling at live shows **What's Working:**
 
 * In-house printing on HP matte photo paper (62lb, acid-free, non-yellowing)
 * Art prints from yours + Shannon's paintings
