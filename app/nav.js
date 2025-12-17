@@ -13,30 +13,53 @@ export function buildSectionIndex(markdown){
 }
 
 export function jumpToSection(editor, lineIndex, sectionIndex){
-  // Move cursor to the heading line
+  // Move cursor to the heading line using Toast UI's API
   try{
-    editor.setSelection([lineIndex, 0], [lineIndex, 0]);
+    // This moves the cursor to the start of the specified line (1-indexed in some versions, 0-indexed in others)
+    const pos = [lineIndex + 1, 0]; // Try 1-indexed first
+    editor.setSelection(pos, pos);
     editor.focus();
   }catch(err){
-    console.warn('Could not set editor selection:', err);
+    // Fallback to 0-indexed
+    try{
+      const pos = [lineIndex, 0];
+      editor.setSelection(pos, pos);
+      editor.focus();
+    }catch(err2){
+      console.warn('Could not move cursor:', err2);
+    }
   }
 
-  // Scroll the preview pane to the heading and highlight it
+  // Scroll the visible editor/preview container
   setTimeout(() => {
-    const editorEl = document.querySelector('.toastui-editor-contents');
-    if (!editorEl) return;
-
-    const headings = editorEl.querySelectorAll('h1, h2, h3, h4');
-    const target = headings[sectionIndex];
+    // Get all possible editor containers
+    const mdScrollContainer = document.querySelector('.toastui-editor-md-container .toastui-editor-md-splitter .toastui-editor-md-vertical-style .ProseMirror, .CodeMirror-scroll');
+    const wwScrollContainer = document.querySelector('.toastui-editor-ww-container .toastui-editor-ww-mode .ProseMirror');
+    const previewScrollContainer = document.querySelector('.toastui-editor-contents');
     
-    if (target) {
-      target.scrollIntoView({ block: 'start', behavior: 'smooth' });
+    // Find which container is currently active/visible
+    const activeContainer = [mdScrollContainer, wwScrollContainer, previewScrollContainer]
+      .find(c => c && c.offsetParent !== null);
+    
+    if(activeContainer){
+      // Calculate approximate scroll position (each line is ~20-30px typically)
+      const estimatedScroll = lineIndex * 24;
+      activeContainer.scrollTo({
+        top: estimatedScroll,
+        behavior: 'smooth'
+      });
       
-      // Visual highlight effect
-      target.classList.add('section-focus');
-      setTimeout(() => target.classList.remove('section-focus'), 1200);
+      // Also try to find and highlight the actual heading element
+      setTimeout(() => {
+        const headings = activeContainer.querySelectorAll('h1, h2, h3, h4');
+        if(headings[sectionIndex]){
+          headings[sectionIndex].scrollIntoView({ block: 'center', behavior: 'smooth' });
+          headings[sectionIndex].classList.add('section-focus');
+          setTimeout(() => headings[sectionIndex].classList.remove('section-focus'), 1200);
+        }
+      }, 150);
     }
-  }, 50);
+  }, 100);
 }
 
 export function highlightSearch(editor, query){
