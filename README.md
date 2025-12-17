@@ -79,7 +79,7 @@
 
 ## 💭 Someday/Maybe
 
-*The dream list - here so it doesn't clutter your brain*
+*Here so it doesn't clutter your brain*
 
 | Project | Category | Notes |
 | ------- | -------- | ----- |
