@@ -71,6 +71,7 @@
 | ------- | ------ | ----- |
 | **Toddler-Friendly Porch** | Home | After porch rebuild - railings, barriers, safe steps |
 | **Row's Room Upgrade** | Home | New bed and layout - maybe extend into porch |
+| **Electrical Raceway Tubing** | Home | Row's room, living room, porch - after porch decision |
 | **Optimize Studio/Bedroom** | Home | Better separation or layout |
 | **Porch Rebuild** | On Hold | A&P went out of business, need to find new contractor |
 | **Caulk Main Bathroom** | To Do | Re-caulk bathroom tiles and tub edge - caulk purchased |
@@ -85,7 +86,6 @@
 | ------- | -------- | ----- |
 | **AMR — The Book** | Publishing | Print-ready version of AMR site content (2026) |
 | **👾Ripplecaster** | Games | Tarot-like HTML game mechanic |
-| **Electrical Raceway Tubing** | Home | Row's room, living room, porch - after porch decision |
 | **Cruxfade Narrative** | Creative | Cruxflare mythos and identity arc |
 | **Artist Gift Print Tier** | Fairweather | Premium product concept |
 
