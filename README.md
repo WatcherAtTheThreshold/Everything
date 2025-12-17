@@ -57,8 +57,8 @@
 
 | What | Where you at? |
 | -------- | ------------- |
-| **Kids Games** | HTML suite of childrens games for ages 3-5 |
-| **Cruxfade-Micro** | HTML Deckcrawler - Art to be finishedw |
+| **👾Kids Games** | HTML suite of childrens games for ages 3-5 |
+| **👾Cruxfade-Micro** | HTML Deckcrawler - Art to be finishedw |
 
 ***
 
@@ -68,7 +68,6 @@
 
 | Project | Status | Notes |
 | ------- | ------ | ----- |
-| **Game - Cruxfade Micro** | Deckcrawler HTML game in Dev | Finish Art |
 | **Porch Rebuild** | On Hold | A&P went out of business, need to find new contractor |
 | **Caulk Main Bathroom** | To Do | Re-caulk bathroom tiles and tub edge - caulk purchased |
 
@@ -81,7 +80,7 @@
 | Project | Category | Notes |
 | ------- | -------- | ----- |
 | **AMR — The Book** | Publishing | Print-ready version of AMR site content (2026) |
-| **Ripplecaster** | Games | Tarot-like HTML game mechanic |
+| **👾Ripplecaster** | Games | Tarot-like HTML game mechanic |
 | **Electrical Raceway Tubing** | Home | Row's room, living room, porch - after porch decision |
 | **Cruxfade Narrative** | Creative | Cruxflare mythos and identity arc |
 | **Toddler-Friendly Porch** | Home | After porch rebuild - railings, barriers, safe steps |
@@ -123,8 +122,8 @@
 | ------- | ----------- |
 | **Markdown-Edit Repo** | WYSWIG and code maekdown file importer/exporter editor |
 | **Stories Page - The Gentle Machine** | My short stories, Poems and Essays on Substack |
-| **Game - Shadows in the Deck** | HTML web card game, playable on The Gentle Machine's Games Page |
-| **Game - Rooks Gambit** | HTML web chess game, playable on The Gentle Machine's Games Page |
+| **👾Game - Shadows in the Deck** | HTML web card game, playable on The Gentle Machine's Games Page |
+| **👾Game - Rooks Gambit** | HTML web chess game, playable on The Gentle Machine's Games Page |
 | **Fairweather Productions Website** | Consolidated domain: Fairweather, Gentle Machine, Second Gaze |
 | **Fairweather Site Base** | Fine art business website |
 | **The Gentle Machine Site Base** | Jessop's mixed-media portfolio site |
