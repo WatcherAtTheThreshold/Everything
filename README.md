@@ -59,6 +59,7 @@
 | -------- | ------------- |
 | **👾Kids Games** | HTML suite of childrens games for ages 3-5, finish Art |
 | **👾Cruxfade-Micro** | HTML Deckcrawler - Finish Art |
+| **👾Cruxfade Battle System** | HTML Cardbattler prototype (one battle complete) |
 
 ***
 
@@ -129,7 +130,6 @@
 | **The Gentle Machine Site Base** | Jessop's mixed-media portfolio site |
 | **Second Gaze Site Base** | Shannon's portfolio site |
 | **Card Pull Page** | 1 or 3 card pull & flip with newest goddess paintings and sayings |
-| **Game - Cruxfade Battle System** | HTML/CSS/JS battle prototype (one battle complete) |
 | **American Mystery Religion** | Collaborative philosophical text, printable layout |
 | **Sigil Oracle** | AI Agent Oracle page, prompted as sage cat |
 | **Music Page** | Gathered music with built-in player on The Gentle Machine |
