@@ -8,6 +8,7 @@ const $ = (sel) => document.querySelector(sel);
 const statusEl = $('#status');
 const sectionsEl = $('#sections');
 const toastEl = $('#toast');
+const lastTouchedEl = $('#lastTouched');
 const fileInput = $('#fileInput');
 
 function toast(msg){
@@ -18,6 +19,18 @@ function toast(msg){
 }
 
 function setStatus(msg){ statusEl.textContent = msg; }
+
+function setLastTouched(){
+  const d = new Date();
+  localStorage.setItem('everything_last_touched', d.toISOString());
+  if(lastTouchedEl) lastTouchedEl.textContent = `Last touched: ${d.toLocaleString()}`;
+}
+
+function loadLastTouched(){
+  const iso = localStorage.getItem('everything_last_touched');
+  if(!iso || !lastTouchedEl) return;
+  lastTouchedEl.textContent = `Last touched: ${new Date(iso).toLocaleString()}`;
+}
 
 let editor;
 
@@ -33,6 +46,9 @@ function createEditor(initialMarkdown){
     hideModeSwitch: false
   });
 
+  // Load last touched time on init
+  loadLastTouched();
+
   // Autosave draft (debounced)
   let t;
   editor.on('change', () => {
@@ -41,32 +57,19 @@ function createEditor(initialMarkdown){
       const md = editor.getMarkdown();
       saveDraft(DRAFT_KEY, md);
       setStatus('Draft saved');
+      setLastTouched();
       refreshSections(md);
     }, 450);
   });
 
-const lastTouchedEl = $('#lastTouched');
-
-function setLastTouched(){
-  const d = new Date();
-  localStorage.setItem('everything_last_touched', d.toISOString());
-  if(lastTouchedEl) lastTouchedEl.textContent = `Last touched: ${d.toLocaleString()}`;
-}
-
-function loadLastTouched(){
-  const iso = localStorage.getItem('everything_last_touched');
-  if(!iso || !lastTouchedEl) return;
-  lastTouchedEl.textContent = `Last touched: ${new Date(iso).toLocaleString()}`;
-}
-
-  
   refreshSections(editor.getMarkdown());
 }
 
 function refreshSections(markdown){
   const items = buildSectionIndex(markdown);
   sectionsEl.innerHTML = '';
-  for(const it of items){
+  for(let i = 0; i < items.length; i++){
+    const it = items[i];
     const a = document.createElement('a');
     a.href = '#';
     a.className = 'sectionItem';
@@ -74,26 +77,11 @@ function refreshSections(markdown){
     a.querySelector('.label').textContent = it.title;
     a.addEventListener('click', (e) => {
       e.preventDefault();
-      jumpToSection(editor, it.line);
+      jumpToSection(editor, it.line, i);
     });
     sectionsEl.appendChild(a);
   }
 }
-
-editor.moveCursorTo(it.line, 0);
-
-// Then scroll the editor viewport
-setTimeout(() => {
-  const editorEl = document.querySelector('.toastui-editor-contents');
-  if (!editorEl) return;
-
-  const headings = editorEl.querySelectorAll('h1, h2, h3, h4');
-  const target = headings[it.index]; // see note below
-  if (target) {
-    target.scrollIntoView({ block: 'start', behavior: 'instant' });
-  }
-}, 0);
-
 
 async function init(){
   setStatus('Loading…');
@@ -113,7 +101,6 @@ async function init(){
   // Wire buttons
   $('#btnPrint')?.addEventListener('click', () => window.print());
 
-
   $('#btnExport').addEventListener('click', () => {
     const md = editor.getMarkdown();
     exportMarkdownFile(md, 'README.md');
@@ -129,6 +116,7 @@ async function init(){
     saveDraft(DRAFT_KEY, md);
     toast('Imported');
     setStatus('Imported file');
+    setLastTouched();
     fileInput.value = '';
   });
 
@@ -138,11 +126,15 @@ async function init(){
     setStatus('Draft cleared');
   });
 
-  // Search (highlights in editor by moving cursor)
+  // Search (debounced for better performance)
+  let searchTimer;
   $('#search').addEventListener('input', (e) => {
+    clearTimeout(searchTimer);
     const q = e.target.value ?? '';
     if(!q.trim()) return;
-    highlightSearch(editor, q.trim());
+    searchTimer = setTimeout(() => {
+      highlightSearch(editor, q.trim());
+    }, 200);
   });
 
   // Keyboard shortcut: Ctrl/Cmd+S exports
@@ -165,7 +157,3 @@ init().catch((err) => {
   setStatus('Error');
   toast('Error loading editor');
 });
-
-target.classList.add('section-focus');
-setTimeout(() => target.classList.remove('section-focus'), 1200);
-
