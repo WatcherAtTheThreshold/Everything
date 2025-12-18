@@ -1,6 +1,6 @@
 import { loadInitialMarkdown, exportMarkdownFile, importMarkdownFile } from './io.js';
-import { saveDraft, loadDraft } from './storage.js';
-import { buildSectionIndex, jumpToSection } from './nav.js';
+import { saveDraft, loadDraft, clearDraft } from './storage.js';
+import { buildSectionIndex, jumpToSection, highlightSearch } from './nav.js';
 
 const DRAFT_KEY = 'everything_editor_draft_v1';
 
@@ -55,38 +55,80 @@ function printMarkdown(editor){
           margin: 0 auto;
           padding: 45px;
         }
-        h1 { font-size: 2em; border-bottom: 1px solid #eaecef; padding-bottom: 0.3em; margin-top: 24px; margin-bottom: 16px; }
-        h2 { font-size: 1.5em; border-bottom: 1px solid #eaecef; padding-bottom: 0.3em; margin-top: 24px; margin-bottom: 16px; }
+        h1 { 
+          font-size: 2em; 
+          border-bottom: 1px solid #eaecef; 
+          padding-bottom: 0.3em;
+          margin-top: 24px;
+          margin-bottom: 16px;
+        }
+        h2 { 
+          font-size: 1.5em; 
+          border-bottom: 1px solid #eaecef; 
+          padding-bottom: 0.3em;
+          margin-top: 24px;
+          margin-bottom: 16px;
+        }
+        h3 { font-size: 1.25em; margin-top: 24px; margin-bottom: 16px; }
+        h4 { font-size: 1em; margin-top: 24px; margin-bottom: 16px; }
         p { margin-top: 0; margin-bottom: 16px; }
-        
-        /* Styled Keyboard Keys for Print */
+        ul, ol { padding-left: 2em; margin-top: 0; margin-bottom: 16px; }
+        li { margin-bottom: 0.25em; }
         code {
+          background: #f6f8fa;
+          border-radius: 3px;
+          padding: 0.2em 0.4em;
           font-family: 'Courier New', monospace;
           font-size: 85%;
+        }
+        pre {
           background: #f6f8fa;
-          border: 1px solid #c8d1db;
           border-radius: 6px;
-          padding: 0.2em 0.4em;
+          padding: 16px;
+          overflow: auto;
+          font-size: 85%;
+          line-height: 1.45;
         }
-
-        /* Specific styling for keys inside the shortcuts table */
-        table code {
-          background: #ffffff;
-          border: 1px solid #adb5bd;
-          box-shadow: 0 1px 0 rgba(0,0,0,0.2);
+        pre code {
+          background: transparent;
+          padding: 0;
+        }
+        table {
+          border-collapse: collapse;
+          width: 100%;
+          margin-bottom: 16px;
+        }
+        table th, table td {
+          border: 1px solid #dfe2e5;
+          padding: 6px 13px;
+        }
+        table th {
+          background: #f6f8fa;
           font-weight: 600;
-          white-space: nowrap;
         }
-
-        table { border-collapse: collapse; width: 100%; margin-bottom: 16px; }
-        table th, table td { border: 1px solid #dfe2e5; padding: 6px 13px; }
-        table th { background: #f6f8fa; font-weight: 600; }
-        
+        table tr:nth-child(2n) {
+          background: #f6f8fa;
+        }
+        blockquote {
+          border-left: 4px solid #dfe2e5;
+          padding: 0 1em;
+          color: #6a737d;
+          margin: 0 0 16px 0;
+        }
+        hr {
+          height: 0.25em;
+          padding: 0;
+          margin: 24px 0;
+          background-color: #e1e4e8;
+          border: 0;
+        }
+        input[type="checkbox"] {
+          margin-right: 0.5em;
+        }
         @media print {
           body { padding: 0; }
-          /* Ensure shadows and borders render in all browsers */
-          * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
           h1, h2, h3 { page-break-after: avoid; }
+          pre, blockquote { page-break-inside: avoid; }
         }
       </style>
     </head>
@@ -95,7 +137,10 @@ function printMarkdown(editor){
       <script>
         window.onload = function() {
           window.print();
-          setTimeout(function() { window.close(); }, 100);
+          // Close window after print dialog
+          setTimeout(function() {
+            window.close();
+          }, 100);
         };
       </script>
     </body>
@@ -157,7 +202,7 @@ function refreshSections(markdown){
 }
 
 async function init(){
-  setStatus('Loading¦');
+  setStatus('Loading…');
 
   const draft = loadDraft(DRAFT_KEY);
   const initial = draft ?? await loadInitialMarkdown('./README.md');
@@ -174,17 +219,14 @@ async function init(){
   // Wire buttons
   $('#btnPrint')?.addEventListener('click', () => {
     printMarkdown(editor);
-    toast('Opening print dialog¦');
+    toast('Opening print dialog…');
   });
 
   $('#btnExport').addEventListener('click', () => {
-  const md = editor.getMarkdown();
-  const filename = $('#fileName').value.trim() || 'README.md';
-  // Ensure it has .md extension
-  const finalName = filename.endsWith('.md') ? filename : filename + '.md';
-  exportMarkdownFile(md, finalName);
-  toast(`Exported ${finalName}`);
-});
+    const md = editor.getMarkdown();
+    exportMarkdownFile(md, 'README.md');
+    toast('Exported README.md');
+  });
 
   $('#btnImport').addEventListener('click', () => fileInput.click());
   fileInput.addEventListener('change', async () => {
@@ -193,27 +235,42 @@ async function init(){
     const md = await importMarkdownFile(file);
     editor.setMarkdown(md);
     saveDraft(DRAFT_KEY, md);
-    $('#fileName').value = file.name;
     toast('Imported');
     setStatus('Imported file');
     setLastTouched();
     fileInput.value = '';
   });
 
+  $('#btnReset')?.addEventListener('click', () => {
+    clearDraft(DRAFT_KEY);
+    toast('Draft cleared');
+    setStatus('Draft cleared');
+  });
 
+  // Search (debounced for better performance)
+  let searchTimer;
+  const searchEl = $('#search');
+  if(searchEl){
+    searchEl.addEventListener('input', (e) => {
+      clearTimeout(searchTimer);
+      const q = e.target.value ?? '';
+      if(!q.trim()) return;
+      searchTimer = setTimeout(() => {
+        highlightSearch(editor, q.trim());
+      }, 200);
+    });
+  }
 
   // Keyboard shortcut: Ctrl/Cmd+S exports
   window.addEventListener('keydown', (e) => {
     const isMac = navigator.platform.toLowerCase().includes('mac');
     const saveCombo = (isMac ? e.metaKey : e.ctrlKey) && e.key.toLowerCase() === 's';
     if(saveCombo){
-  e.preventDefault();
-  const md = editor.getMarkdown();
-  const filename = $('#fileName').value.trim() || 'README.md';
-  const finalName = filename.endsWith('.md') ? filename : filename + '.md';
-  exportMarkdownFile(md, finalName);
-  toast(`Exported ${finalName}`);
-}
+      e.preventDefault();
+      const md = editor.getMarkdown();
+      exportMarkdownFile(md, 'README.md');
+      toast('Exported README.md');
+    }
   });
 
   toast('Ready');
