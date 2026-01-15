@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Grumbot Test</title>
+</head>
+<body>
+    <h1>Test Grumbot</h1>
+    <input type="text" id="message" placeholder="Say something to Grumbot...">
+    <button onclick="testGrumbot()">Send</button>
+    <div id="response" style="margin-top: 20px; padding: 10px; background: #f0f0f0;"></div>
+
+    <script>
+        async function testGrumbot() {
+            const message = document.getElementById('message').value;
+            const responseDiv = document.getElementById('response');
+            
+            responseDiv.textContent = 'Loading...';
+            
+            try {
+                const response = await fetch('https://sigil-oracle-server.onrender.com/grumbot', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message })
+                });
+                
+                const data = await response.json();
+                responseDiv.textContent = data.response || data.error;
+            } catch (err) {
+                responseDiv.textContent = 'Error: ' + err.message;
+            }
+        }
+    </script>
+</body>
+</html>
