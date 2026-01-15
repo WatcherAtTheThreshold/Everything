@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COHERENCE</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Orbitron:wght@700&display=swap');
+        
+        :root {
+            --signal-green: #00ff41;
+            --signal-amber: #ffaa00;
+            --signal-red: #ff0044;
+            --void: #0a0e27;
+            --grid-line: #1a2456;
+            --text-dim: #4a5f8f;
+            --text-bright: #e0e8ff;
+            --distortion: #ff0088;
+            --anchor: #00ffff;
+            --threshold: #ffaa00;
+            --gold: #ffd700;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'IBM Plex Mono', monospace;
+            background: var(--void);
+            color: var(--text-bright);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+            padding: 1rem;
+        }
+        
+        /* Scanline effect */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 255, 65, 0.03) 0px,
+                transparent 1px,
+                transparent 2px,
+                rgba(0, 255, 65, 0.03) 3px
+            );
+            pointer-events: none;
+            z-index: 1000;
+            animation: scanline 8s linear infinite;
+        }
+        
+        @keyframes scanline {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(100px); }
+        }
+        
+        /* Subtle noise texture */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.05'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 999;
+        }
+        
+        .container {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            max-width: 100%;
+        }
+        
+        header {
+            margin-bottom: 1.5rem;
+            animation: fadeIn 1s ease-out;
+        }
+        
+        h1 {
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 700;
+            letter-spacing: 0.5rem;
+            text-transform: uppercase;
+            background: linear-gradient(135deg, var(--signal-green), var(--signal-amber));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
+            margin-bottom: 0.5rem;
+        }
+        
+        .subtitle {
+            font-size: clamp(0.7rem, 2vw, 0.9rem);
+            color: var(--text-dim);
+            letter-spacing: 0.3rem;
+            text-transform: uppercase;
+        }
+        
+        #game-container {
+            background: rgba(10, 14, 39, 0.8);
+            border: 2px solid var(--grid-line);
+            padding: 1.5rem;
+            border-radius: 4px;
+            box-shadow: 
+                0 0 40px rgba(0, 255, 65, 0.1),
+                inset 0 0 40px rgba(0, 0, 0, 0.5);
+            animation: fadeIn 1s ease-out 0.3s both;
+            display: inline-block;
+        }
+        
+        #grid {
+            display: grid;
+            grid-template-columns: repeat(13, 1fr);
+            gap: 2px;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 1rem;
+            border: 1px solid var(--grid-line);
+            border-radius: 2px;
+            width: min(90vw, 600px);
+            height: min(90vw, 600px);
+            max-width: 600px;
+            max-height: 600px;
+        }
+        
+        .cell {
+            aspect-ratio: 1;
+            border-radius: 1px;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        
+        /* Tile types */
+        .player { 
+            background: var(--signal-green);
+            box-shadow: 
+                0 0 10px var(--signal-green),
+                inset 0 0 10px rgba(0, 255, 65, 0.5);
+            animation: playerPulse 2s ease-in-out infinite;
+        }
+        
+        .ground { 
+            background: rgba(74, 95, 143, 0.1);
+            border: 1px solid rgba(26, 36, 86, 0.3);
+        }
+        
+        .boundary { 
+            background: var(--grid-line);
+            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.5);
+        }
+        
+        .distortion { 
+            background: var(--distortion);
+            box-shadow: 
+                0 0 8px var(--distortion),
+                inset 0 0 10px rgba(255, 0, 136, 0.5);
+            animation: distortionFlicker 3s ease-in-out infinite;
+        }
+        
+        .anchor { 
+            background: var(--anchor);
+            box-shadow: 
+                0 0 12px var(--anchor),
+                inset 0 0 10px rgba(0, 255, 255, 0.5);
+            animation: anchorGlow 2s ease-in-out infinite;
+        }
+        
+        .threshold { 
+            background: var(--threshold);
+            box-shadow: 
+                0 0 6px var(--threshold),
+                inset 0 0 8px rgba(255, 170, 0, 0.5);
+        }
+        
+        .artifact { 
+            background: var(--gold);
+            box-shadow: 
+                0 0 10px var(--gold),
+                inset 0 0 10px rgba(255, 215, 0, 0.5);
+            animation: artifactSparkle 1.5s ease-in-out infinite;
+        }
+        
+        .exit { 
+            background: var(--signal-green);
+            box-shadow: 
+                0 0 15px var(--signal-green),
+                inset 0 0 15px rgba(0, 255, 65, 0.7);
+            animation: exitPulse 1s ease-in-out infinite;
+        }
+        
+        /* Animations */
+        @keyframes playerPulse {
+            0%, 100% { 
+                opacity: 1; 
+                box-shadow: 0 0 10px var(--signal-green), inset 0 0 10px rgba(0, 255, 65, 0.5);
+            }
+            50% { 
+                opacity: 0.8; 
+                box-shadow: 0 0 20px var(--signal-green), inset 0 0 15px rgba(0, 255, 65, 0.7);
+            }
+        }
+        
+        @keyframes distortionFlicker {
+            0%, 100% { opacity: 1; }
+            45%, 55% { opacity: 0.7; }
+            50% { opacity: 0.85; }
+        }
+        
+        @keyframes anchorGlow {
+            0%, 100% { 
+                box-shadow: 0 0 12px var(--anchor), inset 0 0 10px rgba(0, 255, 255, 0.5);
+            }
+            50% { 
+                box-shadow: 0 0 20px var(--anchor), inset 0 0 20px rgba(0, 255, 255, 0.7);
+            }
+        }
+        
+        @keyframes artifactSparkle {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.9; }
+        }
+        
+        @keyframes exitPulse {
+            0%, 100% { 
+                transform: scale(1);
+                box-shadow: 0 0 15px var(--signal-green), inset 0 0 15px rgba(0, 255, 65, 0.7);
+            }
+            50% { 
+                transform: scale(1.1);
+                box-shadow: 0 0 25px var(--signal-green), inset 0 0 25px rgba(0, 255, 65, 0.9);
+            }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        #status {
+            margin-top: 1.5rem;
+            font-size: clamp(0.85rem, 2vw, 1.1rem);
+            letter-spacing: 0.15rem;
+            padding: 1rem 1.5rem;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid var(--grid-line);
+            border-radius: 2px;
+            display: inline-block;
+            width: 100%;
+            max-width: 600px;
+        }
+        
+        .status-line {
+            margin: 0.25rem 0;
+        }
+        
+        .coh-value {
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+        
+        .coh-high { color: var(--signal-green); }
+        .coh-medium { color: var(--signal-amber); }
+        .coh-low { color: var(--signal-red); text-shadow: 0 0 8px var(--signal-red); }
+        
+        .state-stable { color: var(--signal-green); }
+        .state-searching { color: var(--signal-amber); }
+        .state-altered { color: var(--anchor); }
+        .state-critical { color: var(--signal-red); animation: textPulse 1s ease-in-out infinite; }
+        
+        @keyframes textPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+        
+        #modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        
+        #modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: var(--void);
+            border: 2px solid var(--grid-line);
+            padding: 2rem;
+            border-radius: 4px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 0 40px rgba(0, 255, 65, 0.2);
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        .modal-title {
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(1.2rem, 3vw, 1.5rem);
+            color: var(--signal-amber);
+            margin-bottom: 1rem;
+            letter-spacing: 0.2rem;
+        }
+        
+        .modal-text {
+            color: var(--text-bright);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+            font-size: clamp(0.85rem, 2vw, 1rem);
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: clamp(0.85rem, 2vw, 1rem);
+            padding: 0.75rem 1.5rem;
+            background: transparent;
+            border: 2px solid var(--signal-green);
+            color: var(--signal-green);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.1rem;
+        }
+        
+        button:hover, button:focus {
+            background: var(--signal-green);
+            color: var(--void);
+            box-shadow: 0 0 20px var(--signal-green);
+            outline: none;
+        }
+        
+        button.secondary {
+            border-color: var(--text-dim);
+            color: var(--text-dim);
+        }
+        
+        button.secondary:hover, button.secondary:focus {
+            background: var(--text-dim);
+            color: var(--void);
+            box-shadow: 0 0 20px var(--text-dim);
+        }
+        
+        button.danger {
+            border-color: var(--signal-red);
+            color: var(--signal-red);
+        }
+        
+        button.danger:hover, button.danger:focus {
+            background: var(--signal-red);
+            color: var(--void);
+            box-shadow: 0 0 20px var(--signal-red);
+        }
+        
+        .instructions {
+            margin-top: 1.5rem;
+            font-size: clamp(0.7rem, 1.8vw, 0.85rem);
+            color: var(--text-dim);
+            letter-spacing: 0.1rem;
+            animation: fadeIn 1s ease-out 0.6s both;
+        }
+        
+        /* Mobile controls */
+        #mobile-controls {
+            display: none;
+            margin-top: 1rem;
+            gap: 0.5rem;
+            max-width: 600px;
+        }
+        
+        @media (max-width: 768px), (pointer: coarse) {
+            #mobile-controls {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                grid-template-rows: repeat(3, 1fr);
+            }
+        }
+        
+        .control-btn {
+            padding: 1.5rem;
+            font-size: 1.5rem;
+            background: rgba(0, 0, 0, 0.6);
+            border: 2px solid var(--grid-line);
+            color: var(--signal-green);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .control-btn:active {
+            background: rgba(0, 255, 65, 0.2);
+            transform: scale(0.95);
+        }
+        
+        .control-btn:nth-child(1) { grid-column: 2; grid-row: 1; }
+        .control-btn:nth-child(2) { grid-column: 1; grid-row: 2; }
+        .control-btn:nth-child(3) { grid-column: 3; grid-row: 2; }
+        .control-btn:nth-child(4) { grid-column: 2; grid-row: 3; }
+        
+        .glitch {
+            animation: glitchShake 0.3s ease-in-out;
+        }
+        
+        @keyframes glitchShake {
+            0%, 100% { transform: translate(0, 0); }
+            25% { transform: translate(-3px, 3px); }
+            50% { transform: translate(3px, -3px); }
+            75% { transform: translate(-3px, -3px); }
+        }
+
+        /* Audio init overlay */
+        #audio-init {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+        }
+
+        #audio-init.hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Audio init overlay -->
+    <div id="audio-init">
+        <div class="modal-content">
+            <div class="modal-title">INITIALIZE SIGNAL</div>
+            <div class="modal-text">Press to begin transmission</div>
+            <button id="init-audio-btn" onclick="initAudio()">START</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <header>
+            <h1>COHERENCE</h1>
+            <div class="subtitle">Signal Decay Protocol</div>
+        </header>
+        
+        <div id="game-container">
+            <div id="grid"></div>
+            <div id="status">
+                <div class="status-line">
+                    COH: <span id="coh-value" class="coh-value coh-high">20</span>
+                </div>
+                <div class="status-line">
+                    STATE: <span id="state-value" class="state-stable">STABLE</span>
+                </div>
+                <div class="status-line">
+                    CARRY: <span id="carry-value">NONE</span>
+                </div>
+            </div>
+        </div>
+        
+        <div id="mobile-controls">
+            <button class="control-btn" onclick="movePlayer(0, -1)">↑</button>
+            <button class="control-btn" onclick="movePlayer(-1, 0)">←</button>
+            <button class="control-btn" onclick="movePlayer(1, 0)">→</button>
+            <button class="control-btn" onclick="movePlayer(0, 1)">↓</button>
+        </div>
+        
+        <div class="instructions">
+            ARROW KEYS OR TAP TO MOVE • FIND ARTIFACT TO UNLOCK EXIT • ESCAPE BEFORE DISSOLUTION
+        </div>
+    </div>
+    
+    <div id="modal">
+        <div class="modal-content">
+            <div class="modal-title" id="modal-title"></div>
+            <div class="modal-text" id="modal-text"></div>
+            <div class="modal-buttons" id="modal-buttons"></div>
+        </div>
+    </div>
+
+    <!-- Audio elements -->
+    <audio id="music-main" loop>
+        <source src="music/coherence.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="music-threshold" loop>
+        <source src="music/coherence-threshold.mp3" type="audio/mpeg">
+    </audio>
+    
+    <script>
+        // Audio system
+        const audioMain = document.getElementById('music-main');
+        const audioThreshold = document.getElementById('music-threshold');
+        let audioInitialized = false;
+
+        function initAudio() {
+            audioMain.volume = 0.5;
+            audioThreshold.volume = 0.5;
+            audioMain.play().then(() => {
+                audioInitialized = true;
+                document.getElementById('audio-init').classList.add('hidden');
+            }).catch(err => {
+                console.log('Audio autoplay prevented:', err);
+                audioInitialized = true;
+                document.getElementById('audio-init').classList.add('hidden');
+            });
+        }
+
+        function switchToThresholdMusic() {
+            if (!audioInitialized) return;
+            audioMain.pause();
+            audioThreshold.play().catch(err => console.log('Threshold music error:', err));
+        }
+
+        // Game State
+        const gameState = {
+            grid: [],
+            playerPos: { x: 1, y: 1 },
+            coherence: 20,
+            belowThreshold: false,
+            turnCounter: 0,
+            carriedArtifact: null,
+            gameOver: false,
+            won: false,
+            anchorUsed: false,
+            thresholdRow: 5,
+            hasArtifact: false // New: track if player has collected an artifact
+        };
+        
+        // Artifact definitions
+        const artifacts = [
+            {
+                name: "RESONANCE INVERTER",
+                description: "Distortions become Anchors. Anchors become Distortions.",
+                cohBonus: 6,
+                effect: "invert"
+            },
+            {
+                name: "CLARITY LENS",
+                description: "See the pattern, pay the price. +1 drain per turn.",
+                cohBonus: 6,
+                effect: "clarity"
+            },
+            {
+                name: "SEVERANCE",
+                description: "Immune to distortion adjacency. Anchors no longer function.",
+                cohBonus: 6,
+                effect: "sever"
+            }
+        ];
+        
+        // Initial grid layout
+        const initialGrid = [
+            ['#','#','#','#','#','#','#','#','#','#','#','#','#'],
+            ['#','@','.','.','.','.','.','.','.','.','.','X','#'],
+            ['#','.','.','.','.','.','.','.','.','.','.','.','#'],
+            ['#','.','.','.','.','~','.','.','.','.','.','.','#'],
+            ['#','.','.','.','.','*','.','.','.','.','.','.','#'],
+            ['#','+','+','+','+','+','+','+','+','+','+','+','#'],
+            ['#','.','.','.','.','*','.','.','.','.','.','.','#'],
+            ['#','.','.','.','.','O','.','.','.','.','.','.','#'],
+            ['#','.','.','~','.','.','.','.','.','.','.','.','#'],
+            ['#','.','.','.','.','.','.','*','.','.','.','.','#'],
+            ['#','.','.','.','.','*','.','.','.','.','.','.','#'],
+            ['#','.','.','.','.','~','.','.','.','.','.','.','#'],
+            ['#','#','#','#','#','#','#','#','#','#','#','#','#']
+        ];
+        
+        // Initialize game
+        function initGame() {
+            gameState.grid = initialGrid.map(row => [...row]);
+            gameState.grid[gameState.playerPos.y][gameState.playerPos.x] = '.';
+            renderGrid();
+            updateStatus();
+        }
+        
+        // Render the grid
+        function renderGrid() {
+            const gridElement = document.getElementById('grid');
+            gridElement.innerHTML = '';
+            
+            for (let y = 0; y < gameState.grid.length; y++) {
+                for (let x = 0; x < gameState.grid[y].length; x++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    
+                    let tile = gameState.grid[y][x];
+                    
+                    // Player position
+                    if (x === gameState.playerPos.x && y === gameState.playerPos.y) {
+                        cell.classList.add('player');
+                    } else {
+                        // Apply classes based on tile type
+                        switch(tile) {
+                            case '.': cell.classList.add('ground'); break;
+                            case '#': cell.classList.add('boundary'); break;
+                            case '~': cell.classList.add('distortion'); break;
+                            case 'O': cell.classList.add('anchor'); break;
+                            case '+': cell.classList.add('threshold'); break;
+                            case '*': cell.classList.add('artifact'); break;
+                            case 'X': cell.classList.add('exit'); break;
+                        }
+                    }
+                    
+                    gridElement.appendChild(cell);
+                }
+            }
+        }
+        
+        // Update status line
+        function updateStatus() {
+            const cohValue = document.getElementById('coh-value');
+            const stateValue = document.getElementById('state-value');
+            const carryValue = document.getElementById('carry-value');
+            
+            // Update coherence
+            cohValue.textContent = gameState.coherence;
+            cohValue.className = 'coh-value';
+            if (gameState.coherence >= 15) {
+                cohValue.classList.add('coh-high');
+            } else if (gameState.coherence >= 8) {
+                cohValue.classList.add('coh-medium');
+            } else {
+                cohValue.classList.add('coh-low');
+            }
+            
+            // Update state
+            let state = 'STABLE';
+            let stateClass = 'state-stable';
+            
+            if (gameState.coherence < 5) {
+                state = 'CRITICAL';
+                stateClass = 'state-critical';
+            } else if (gameState.carriedArtifact) {
+                state = 'ALTERED';
+                stateClass = 'state-altered';
+            } else if (gameState.belowThreshold) {
+                state = 'SEARCHING';
+                stateClass = 'state-searching';
+            }
+            
+            stateValue.textContent = state;
+            stateValue.className = stateClass;
+            
+            // Update carried item
+            carryValue.textContent = gameState.carriedArtifact ? gameState.carriedArtifact.name : 'NONE';
+        }
+        
+        // Handle movement
+        function movePlayer(dx, dy) {
+            if (gameState.gameOver) return;
+            
+            const newX = gameState.playerPos.x + dx;
+            const newY = gameState.playerPos.y + dy;
+            
+            // Check boundaries
+            if (gameState.grid[newY][newX] === '#') {
+                // Glitch effect on collision
+                document.getElementById('grid').classList.add('glitch');
+                setTimeout(() => {
+                    document.getElementById('grid').classList.remove('glitch');
+                }, 300);
+                return;
+            }
+            
+            // Move player
+            gameState.playerPos.x = newX;
+            gameState.playerPos.y = newY;
+            
+            // Process turn
+            processTurn();
+        }
+        
+        // Process a game turn
+        function processTurn() {
+            gameState.turnCounter++;
+            
+            // Base movement cost
+            let cohCost = 1;
+            
+            // Clarity lens effect
+            if (gameState.carriedArtifact && gameState.carriedArtifact.effect === 'clarity') {
+                cohCost += 1;
+            }
+            
+            gameState.coherence -= cohCost;
+            
+            // Check current tile
+            const currentTile = gameState.grid[gameState.playerPos.y][gameState.playerPos.x];
+            
+            // Exit check - REQUIRES ARTIFACT
+            if (currentTile === 'X') {
+                if (!gameState.hasArtifact) {
+                    showMessage('EXIT LOCKED', 'ARTIFACT REQUIRED TO UNLOCK TRANSMISSION', false);
+                    return;
+                }
+                winGame();
+                return;
+            }
+            
+            // Anchor check
+            if (currentTile === 'O' && !gameState.anchorUsed) {
+                if (!gameState.carriedArtifact || gameState.carriedArtifact.effect !== 'sever') {
+                    const invert = gameState.carriedArtifact && gameState.carriedArtifact.effect === 'invert';
+                    if (!invert) {
+                        gameState.coherence += 10;
+                        gameState.grid[gameState.playerPos.y][gameState.playerPos.x] = '.';
+                        showMessage('ANCHOR ACTIVATED', '+10 COHERENCE', false);
+                    }
+                } else {
+                    // Severance: anchor doesn't work
+                    showMessage('ANCHOR INERT', 'SEVERANCE PREVENTS RESTORATION', false);
+                }
+            }
+            
+            // Artifact pickup check
+            if (currentTile === '*') {
+                handleArtifactPickup();
+                return;
+            }
+            
+            // Threshold crossing check
+            if (currentTile === '+' && !gameState.belowThreshold) {
+                gameState.belowThreshold = true;
+                switchToThresholdMusic();
+                showMessage('THRESHOLD CROSSED', 'DISTORTION FIELD ACTIVE • NO RETURN', false);
+            }
+            
+            // Distortion adjacency/standing check
+            checkDistortionDrain();
+            
+            // Post-threshold spreading
+            if (gameState.belowThreshold && gameState.turnCounter % 3 === 0) {
+                spreadDistortions();
+            }
+            
+            // Coherence check
+            if (gameState.coherence <= 0) {
+                loseGame();
+                return;
+            }
+            
+            renderGrid();
+            updateStatus();
+        }
+        
+        // Check for distortion drain
+        function checkDistortionDrain() {
+            const px = gameState.playerPos.x;
+            const py = gameState.playerPos.y;
+            const currentTile = gameState.grid[py][px];
+            
+            // If carrying severance artifact, immune to distortion
+            if (gameState.carriedArtifact && gameState.carriedArtifact.effect === 'sever') {
+                return;
+            }
+            
+            const invert = gameState.carriedArtifact && gameState.carriedArtifact.effect === 'invert';
+            
+            // Standing on distortion
+            if (currentTile === '~') {
+                if (!invert) {
+                    gameState.coherence -= 2;
+                } else {
+                    gameState.coherence += 2; // Inverted: distortion heals
+                }
+                return;
+            }
+            
+            // Check adjacent tiles (cardinal only)
+            const adjacent = [
+                {x: px-1, y: py},
+                {x: px+1, y: py},
+                {x: px, y: py-1},
+                {x: px, y: py+1}
+            ];
+            
+            for (let pos of adjacent) {
+                if (pos.y >= 0 && pos.y < gameState.grid.length && 
+                    pos.x >= 0 && pos.x < gameState.grid[pos.y].length) {
+                    if (gameState.grid[pos.y][pos.x] === '~') {
+                        if (!invert) {
+                            gameState.coherence -= 1;
+                        } else {
+                            gameState.coherence += 1; // Inverted: adjacency heals
+                        }
+                        return; // Only drain once even if multiple adjacent
+                    }
+                }
+            }
+        }
+        
+        // Spread distortions
+        function spreadDistortions() {
+            const distortions = [];
+            
+            // Find all current distortions
+            for (let y = 0; y < gameState.grid.length; y++) {
+                for (let x = 0; x < gameState.grid[y].length; x++) {
+                    if (gameState.grid[y][x] === '~') {
+                        distortions.push({x, y});
+                    }
+                }
+            }
+            
+            // Spawn new distortions
+            for (let distortion of distortions) {
+                const directions = [
+                    {x: -1, y: 0},
+                    {x: 1, y: 0},
+                    {x: 0, y: -1},
+                    {x: 0, y: 1}
+                ];
+                
+                // Pick random direction
+                const dir = directions[Math.floor(Math.random() * directions.length)];
+                const newX = distortion.x + dir.x;
+                const newY = distortion.y + dir.y;
+                
+                // Spawn if valid and empty
+                if (newY >= 0 && newY < gameState.grid.length &&
+                    newX >= 0 && newX < gameState.grid[newY].length &&
+                    gameState.grid[newY][newX] === '.') {
+                    gameState.grid[newY][newX] = '~';
+                }
+            }
+        }
+        
+        // Handle artifact pickup
+        function handleArtifactPickup() {
+            // Pick random artifact
+            const artifact = artifacts[Math.floor(Math.random() * artifacts.length)];
+            
+            showArtifactPrompt(artifact);
+        }
+        
+        // Show artifact pickup prompt
+        function showArtifactPrompt(artifact) {
+            const modal = document.getElementById('modal');
+            const title = document.getElementById('modal-title');
+            const text = document.getElementById('modal-text');
+            const buttons = document.getElementById('modal-buttons');
+            
+            title.textContent = `ARTIFACT: ${artifact.name}`;
+            text.innerHTML = `
+                ${artifact.description}<br><br>
+                <strong>IMMEDIATE: +${artifact.cohBonus} COHERENCE</strong>
+            `;
+            
+            let buttonHTML = `<button onclick="acceptArtifact(${artifacts.indexOf(artifact)})" id="modal-primary-btn">ACCEPT</button>`;
+            
+            // If player already has an artifact, show trade/discard options
+            if (gameState.carriedArtifact) {
+                buttonHTML += `<button class="danger" onclick="tradeArtifact(${artifacts.indexOf(artifact)})" id="modal-secondary-btn">TRADE</button>`;
+                buttonHTML += `<button class="secondary" onclick="declineArtifact()" id="modal-tertiary-btn">DECLINE</button>`;
+            } else {
+                buttonHTML += `<button class="secondary" onclick="declineArtifact()" id="modal-secondary-btn">DECLINE</button>`;
+            }
+            
+            buttons.innerHTML = buttonHTML;
+            modal.classList.add('active');
+            
+            // Focus first button
+            setTimeout(() => {
+                document.getElementById('modal-primary-btn').focus();
+            }, 100);
+        }
+        
+        // Accept artifact
+        function acceptArtifact(index) {
+            const artifact = artifacts[index];
+            
+            if (gameState.carriedArtifact) {
+                // Can't accept if already carrying
+                showMessage('INVENTORY FULL', 'Trade or discard current artifact first', false);
+                return;
+            }
+            
+            gameState.carriedArtifact = artifact;
+            gameState.hasArtifact = true; // Mark that player has collected an artifact
+            gameState.coherence += artifact.cohBonus;
+            gameState.grid[gameState.playerPos.y][gameState.playerPos.x] = '.';
+            
+            document.getElementById('modal').classList.remove('active');
+            
+            renderGrid();
+            updateStatus();
+        }
+        
+        // Trade artifact
+        function tradeArtifact(index) {
+            const newArtifact = artifacts[index];
+            gameState.carriedArtifact = newArtifact;
+            gameState.coherence += newArtifact.cohBonus;
+            gameState.grid[gameState.playerPos.y][gameState.playerPos.x] = '.';
+            
+            document.getElementById('modal').classList.remove('active');
+            showMessage('ARTIFACT TRADED', `Now carrying: ${newArtifact.name}`, false);
+            
+            renderGrid();
+            updateStatus();
+        }
+        
+        // Decline artifact
+        function declineArtifact() {
+            document.getElementById('modal').classList.remove('active');
+            renderGrid();
+            updateStatus();
+        }
+        
+        // Show message modal
+        function showMessage(title, message, isGameEnd) {
+            const modal = document.getElementById('modal');
+            const titleEl = document.getElementById('modal-title');
+            const text = document.getElementById('modal-text');
+            const buttons = document.getElementById('modal-buttons');
+            
+            titleEl.textContent = title;
+            text.textContent = message;
+            
+            if (isGameEnd) {
+                buttons.innerHTML = '<button onclick="location.reload()" id="modal-primary-btn">RESET SIGNAL</button>';
+            } else {
+                buttons.innerHTML = '<button onclick="closeMessage()" id="modal-primary-btn">CONTINUE</button>';
+            }
+            
+            modal.classList.add('active');
+            
+            // Focus button
+            setTimeout(() => {
+                document.getElementById('modal-primary-btn').focus();
+            }, 100);
+        }
+        
+        // Close message
+        function closeMessage() {
+            document.getElementById('modal').classList.remove('active');
+        }
+        
+        // Win game
+        function winGame() {
+            gameState.gameOver = true;
+            gameState.won = true;
+            
+            let message = '';
+            if (gameState.coherence >= 15) {
+                message = 'YOU EMERGED WHOLE • SIGNAL PRESERVED';
+            } else if (gameState.coherence >= 8) {
+                message = 'YOU MADE IT OUT, BARELY • FRAGMENTS REMAIN';
+            } else {
+                message = 'YOU ESCAPED WITH FRAGMENTS • BARELY COHERENT';
+            }
+            
+            showMessage('TRANSMISSION COMPLETE', message, true);
+        }
+        
+        // Lose game
+        function loseGame() {
+            gameState.gameOver = true;
+            showMessage('SIGNAL LOST', 'DISSOLUTION • COHERENCE COLLAPSED', true);
+        }
+        
+        // Keyboard controls
+        document.addEventListener('keydown', (e) => {
+            if (gameState.gameOver) return;
+            
+            // Check if modal is active
+            const modalActive = document.getElementById('modal').classList.contains('active');
+            
+            if (modalActive) {
+                // Handle Enter key in modals
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const primaryBtn = document.getElementById('modal-primary-btn');
+                    if (primaryBtn) primaryBtn.click();
+                }
+                return;
+            }
+            
+            switch(e.key) {
+                case 'ArrowUp':
+                case 'w':
+                case 'W':
+                    e.preventDefault();
+                    movePlayer(0, -1);
+                    break;
+                case 'ArrowDown':
+                case 's':
+                case 'S':
+                    e.preventDefault();
+                    movePlayer(0, 1);
+                    break;
+                case 'ArrowLeft':
+                case 'a':
+                case 'A':
+                    e.preventDefault();
+                    movePlayer(-1, 0);
+                    break;
+                case 'ArrowRight':
+                case 'd':
+                case 'D':
+                    e.preventDefault();
+                    movePlayer(1, 0);
+                    break;
+            }
+        });
+        
+        // Initialize on load
+        initGame();
+    </script>
+</body>
+</html>
