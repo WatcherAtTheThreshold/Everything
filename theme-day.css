@@ -16,14 +16,14 @@
   --shadow: 0 1px 10px rgba(0,0,0,.04);
 }
 
-/* Background: remove sci-fi gradients */
+/* Background: remove sci-fi gradients 
 body{
   background: var(--bg) !important;
   color: var(--text) !important;
-}
+}*/
 
-/* Kill the grid (or make it extremely faint) */
-.bg-grid{ opacity: 0 !important; }
+/* Kill the grid (or make it extremely faint) 
+.bg-grid{ opacity: 0 !important; }*/
 
 /* Panels: paper-like */
 .panel{
