@@ -19,7 +19,7 @@
 html,body{height:100%}
 body{
   margin:0;
-  background: radial-gradient(1200px 800px at 20% 0%, #0d1930 0%, var(--bg) 50%, #06080c 100%);
+  background: radial-gradient(1200px 800px at 20% 0%, #142443 0%, #0f1520 55%, #0b0f16 100%);
   color:var(--text);
   font-family:var(--sans);
 }
