@@ -2,9 +2,9 @@
   --bg:#070b10;
   --panel:#0b1220cc;
   --panel2:#0b122099;
-  --text:#d7e3ff;
-  --muted:#86a0c9;
-  --line:#1c2b44;
+  --text:#e8efff;         /* slightly brighter */
+  --muted:#b9c8e8;        /* MUCH brighter than before */
+  --line:rgba(255,255,255,.12); /* softer borders */
   --hot:#b7f5ff;
   --warn:#ffd38a;
   --bad:#ff8e8e;
@@ -55,14 +55,14 @@ body{
   margin-top:4px;
   font-family:var(--mono);
   color:var(--muted);
-  font-size:12px;
+  font-size:13px;
 }
 
 .status{
   display:grid;
   gap:6px;
   font-family:var(--mono);
-  font-size:12px;
+  font-size:13px;
   color:var(--muted);
 }
 .status__line{display:flex; gap:10px; justify-content:flex-end}
@@ -102,12 +102,12 @@ body{
 .panel__title{
   font-family:var(--mono);
   letter-spacing:.14em;
-  font-size:12px;
+  font-size:13px;
   color:var(--hot);
 }
 .panel__meta{
   font-family:var(--mono);
-  font-size:11px;
+  font-size:12px;
   color:var(--muted);
 }
 
@@ -136,7 +136,7 @@ body{
 .capture__hint{
   color:var(--muted);
   font-family:var(--mono);
-  font-size:11px;
+  font-size:12px;
   line-height:1.35;
 }
 .capture__hint code{
@@ -182,25 +182,25 @@ body{
 }
 .item__title{
   font-family:var(--mono);
-  font-size:12px;
+  font-size:13px;
   letter-spacing:.05em;
 }
 .item__meta{
   font-family:var(--mono);
-  font-size:11px;
+  font-size:12px;
   color:var(--muted);
   white-space:nowrap;
 }
 .item__body{
   margin-top:8px;
   color:rgba(215,227,255,.9);
-  font-size:13px;
+  font-size:14px;
   line-height:1.45;
 }
 .tags{margin-top:8px; display:flex; gap:6px; flex-wrap:wrap}
 .tag{
   font-family:var(--mono);
-  font-size:11px;
+  font-size:12px;
   color:var(--muted);
   border:1px solid var(--line);
   background: rgba(255,255,255,.03);
@@ -211,7 +211,7 @@ body{
 .subhead{
   padding:10px 10px 0 10px;
   font-family:var(--mono);
-  font-size:11px;
+  font-size:12px;
   letter-spacing:.12em;
   color:var(--muted);
 }
@@ -232,7 +232,7 @@ body{
   color:var(--text);
   padding:8px 12px;
   font-family:var(--mono);
-  font-size:12px;
+  font-size:13px;
   outline:none;
 }
 .filter:focus{border-color: rgba(183,245,255,.55); box-shadow: 0 0 0 3px rgba(183,245,255,.08);}
@@ -246,7 +246,7 @@ body{
 }
 .tools__note{
   font-family:var(--mono);
-  font-size:11px;
+  font-size:12px;
   color:var(--muted);
   margin-left:auto;
   max-width: 520px;
@@ -255,7 +255,7 @@ body{
 .footer{padding:10px 14px 14px 14px}
 .micro{
   font-family:var(--mono);
-  font-size:11px;
+  font-size:12px;
   color:rgba(134,160,201,.9);
   opacity:.9;
 }
