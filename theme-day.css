@@ -25,17 +25,17 @@ body{
 /* Kill the grid (or make it extremely faint) 
 .bg-grid{ opacity: 0 !important; }*/
 
-/* Panels: paper-like */
+/* Panels: paper-like 
 .panel{
   background: rgba(255,255,255,.78) !important;
   border-color: var(--line) !important;
-}
+}*/
 
-/* Topbar: match your Markdown Editor topbar feel */
+/* Topbar: match your Markdown Editor topbar feel 
 .topbar{
   background: rgba(251,250,248,.88) !important;
   border-bottom: 1px solid var(--line) !important;
-}
+}*/
 
 /* Inputs */
 #captureInput,
