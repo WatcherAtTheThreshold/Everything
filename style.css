@@ -469,6 +469,13 @@ body {
   opacity: 0.8;
 }
 
+/* Highlight filtered matches */
+.item--match {
+  border-color: var(--hot);
+  background: rgba(74, 111, 165, 0.06);
+  box-shadow: var(--shadow-active);
+}
+
 .tags {
   margin-top: 6px;
   display: flex;
