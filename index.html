@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Everything — Console v2</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style-v2.css" />
 </head>
 <body>
   <header class="topbar">
@@ -46,9 +46,18 @@
         <div class="capture">
           <textarea id="captureInput" spellcheck="false" placeholder="Type a note… or 'monday: task' to schedule"></textarea>
           <div class="capture__hint">
-            Day prefix: <code>monday:</code> <code>tue:</code> etc. • Tags: <code>#like-this</code> • Due: <code>due:01-20-2026</code> • <code>/project</code> <code>/note</code>
+            Day prefix: <code>monday:</code> <code>tue:</code> etc. • Tags: <code>#like-this</code> • Due: <code>due:2026-01-20</code> • <code>/project</code> <code>/note</code>
           </div>
         </div>
+      </section>
+
+      <!-- FILTER -->
+      <section class="panel panel--filter">
+        <div class="filter-bar">
+          <input id="filterInput" class="filter-input" placeholder="Filter by tag or text..." spellcheck="false" />
+          <button id="clearFilter" class="btn-clear" title="Clear filter">×</button>
+        </div>
+        <div id="tagChips" class="tag-chips"></div>
       </section>
 
       <!-- THIS WEEK -->
@@ -127,6 +136,6 @@
     </div>
   </footer>
 
-  <script src="app.js"></script>
+  <script src="app-v2.js"></script>
 </body>
 </html>
