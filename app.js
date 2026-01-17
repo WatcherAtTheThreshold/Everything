@@ -492,6 +492,14 @@ function renderWeekView() {
   const container = $("#weekView");
   container.innerHTML = "";
 
+for (const item of dayItems) {
+  const card = renderItemCard(item, { compact: true });
+  if (hasFilter) {
+    card.classList.add('item--match');
+  }
+  itemsContainer.appendChild(card);
+}
+
 for (const day of weekDays) {
   // Get ALL items for this day (don't filter yet)
   const allDayItems = ALL.filter(it => 
