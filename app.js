@@ -30,7 +30,16 @@ function extractTags(text) {
 }
 
 function parseDue(text) {
-  const m = text.match(/due:(\d{4}-\d{2}-\d{2})/i);
+  // Try dd-mm-yyyy first (European/display style)
+  let m = text.match(/due:(\d{2})-(\d{2})-(\d{4})/i);
+  if (m) {
+    const [_, day, month, year] = m;
+    const d = new Date(`${year}-${month}-${day}T09:00:00`);
+    return isNaN(d.getTime()) ? null : d.toISOString();
+  }
+  
+  // Fall back to yyyy-mm-dd (ISO style)
+  m = text.match(/due:(\d{4})-(\d{2})-(\d{2})/i);
   if (!m) return null;
   const d = new Date(m[1] + "T09:00:00");
   return isNaN(d.getTime()) ? null : d.toISOString();
