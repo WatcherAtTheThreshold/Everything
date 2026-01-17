@@ -30,7 +30,16 @@ function extractTags(text) {
 }
 
 function parseDue(text) {
-  const m = text.match(/due:(\d{4}-\d{2}-\d{2})/i);
+  // Try dd-mm-yyyy first (European/display style)
+  let m = text.match(/due:(\d{2})-(\d{2})-(\d{4})/i);
+  if (m) {
+    const [_, day, month, year] = m;
+    const d = new Date(`${year}-${month}-${day}T09:00:00`);
+    return isNaN(d.getTime()) ? null : d.toISOString();
+  }
+  
+  // Fall back to yyyy-mm-dd (ISO style)
+  m = text.match(/due:(\d{4})-(\d{2})-(\d{2})/i);
   if (!m) return null;
   const d = new Date(m[1] + "T09:00:00");
   return isNaN(d.getTime()) ? null : d.toISOString();
@@ -293,10 +302,16 @@ async function addItem(text) {
   const tags = extractTags(body);
   const dueAt = parseDue(body);
 
-  // Title heuristic
+  // Title heuristic - use first line if reasonable length, otherwise truncate
   const lines = body.split("\n");
   const first = lines[0].trim();
-  title = first.length > 0 && first.length <= 60 ? first : `${type.toUpperCase()} • ${first.slice(0, 40)}…`;
+  if (first.length > 0 && first.length <= 80) {
+    title = first;
+  } else if (first.length > 80) {
+    title = first.slice(0, 77) + "…";
+  } else {
+    title = "(untitled)";
+  }
 
   const item = {
     id: makeId(),
@@ -342,12 +357,25 @@ async function openEditor(id) {
 
   // Update body/tags/due
   item.body = action;
-  item.tags = extractTags(action);
-  item.dueAt = parseDue(action);
+  
+  // Re-parse command prefixes if present
+  if (item.body.toLowerCase().startsWith("/project")) {
+    item.type = "project";
+    item.body = item.body.replace(/^\/project\s*/i, "").trim();
+  } else if (item.body.toLowerCase().startsWith("/task")) {
+    item.type = "task";
+    item.body = item.body.replace(/^\/task\s*/i, "").trim();
+  } else if (item.body.toLowerCase().startsWith("/note")) {
+    item.type = "note";
+    item.body = item.body.replace(/^\/note\s*/i, "").trim();
+  }
+  
+  item.tags = extractTags(item.body);
+  item.dueAt = parseDue(item.body);
   item.updatedAt = nowISO();
 
   // Re-parse day if changed
-  const dayParse = parseDay(action);
+  const dayParse = parseDay(item.body);
   if (dayParse) {
     item.scheduledDay = dayParse.day;
     item.body = dayParse.text;
@@ -355,7 +383,11 @@ async function openEditor(id) {
 
   // Update title
   const first = (item.body.split("\n")[0] || "").trim();
-  if (first && first.length <= 80) item.title = first;
+  if (first.length > 0 && first.length <= 80) {
+    item.title = first;
+  } else if (first.length > 80) {
+    item.title = first.slice(0, 77) + "…";
+  }
 
   await dbPut(item);
   await refresh();
@@ -460,10 +492,22 @@ function renderWeekView() {
   const container = $("#weekView");
   container.innerHTML = "";
 
-  for (const day of weekDays) {
-    const dayItems = ALL.filter(it => 
-      it.scheduledDay === day.name && !it.done && matchesFilter(it)
-    ).sort((a,b) => (a.createdAt||"").localeCompare(b.createdAt||""));
+for (const item of dayItems) {
+  const card = renderItemCard(item, { compact: true });
+  if (hasFilter) {
+    card.classList.add('item--match');
+  }
+  itemsContainer.appendChild(card);
+}
+
+for (const day of weekDays) {
+  // Get ALL items for this day (don't filter yet)
+  const allDayItems = ALL.filter(it => 
+    it.scheduledDay === day.name && !it.done
+  ).sort((a,b) => (a.createdAt||"").localeCompare(b.createdAt||""));
+  
+  // Then filter for display
+  const dayItems = allDayItems.filter(matchesFilter);
 
     const isToday = day.name === today;
     const isExpanded = EXPANDED_DAYS.has(day.name);
@@ -488,9 +532,15 @@ function renderWeekView() {
     const itemsContainer = document.createElement("div");
     itemsContainer.className = "day__items";
     
-    if (dayItems.length === 0) {
-      itemsContainer.innerHTML = '<div class="day__empty">No tasks scheduled</div>';
-    } else {
+   const hasFilter = FILTER_TEXT !== "" || ACTIVE_TAGS.size > 0;
+
+if (dayItems.length === 0 && !hasFilter) {
+  // No items at all on this day
+  itemsContainer.innerHTML = '<div class="day__empty">No tasks scheduled</div>';
+} else if (dayItems.length === 0 && hasFilter) {
+  // Items exist but none match filter
+  itemsContainer.innerHTML = '<div class="day__empty">No matches for current filter</div>';
+} else {
       for (const item of dayItems) {
         itemsContainer.appendChild(renderItemCard(item, { compact: true }));
       }
