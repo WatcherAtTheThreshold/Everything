@@ -135,7 +135,7 @@ body {
 .panel__title {
   font-family: var(--mono);
   letter-spacing: 0.12em;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   color: var(--hot);
   text-transform: uppercase;
@@ -143,7 +143,7 @@ body {
 
 .panel__meta {
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: 12px;
   color: var(--muted);
 }
 
@@ -162,7 +162,7 @@ body {
   color: var(--text);
   padding: 12px;
   font-family: var(--mono);
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.6;
   outline: none;
   transition: border-color 0.2s ease;
@@ -181,7 +181,7 @@ body {
 .capture__hint {
   color: var(--muted);
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.5;
 }
 
@@ -191,7 +191,7 @@ body {
   border: 1px solid var(--line);
   background: rgba(107, 101, 96, 0.04);
   color: var(--text);
-  font-size: 10px;
+  font-size: 11px;
 }
 
 /* ========== WEEK VIEW ========== */
@@ -245,7 +245,7 @@ body {
 
 .day__name {
   font-family: var(--mono);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   letter-spacing: 0.05em;
   color: var(--text);
@@ -258,13 +258,13 @@ body {
 
 .day__date {
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: 12px;
   color: var(--muted);
 }
 
 .day__count {
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: 12px;
   color: var(--muted);
   padding: 2px 7px;
   border-radius: 999px;
@@ -288,7 +288,7 @@ body {
 
 .day__empty {
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: 12px;
   color: var(--muted);
   padding: 6px 0;
   font-style: italic;
@@ -334,7 +334,7 @@ body {
 
 .item__title {
   font-family: var(--mono);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 500;
   letter-spacing: 0.02em;
   color: var(--text);
@@ -343,7 +343,7 @@ body {
 
 .item__meta {
   font-family: var(--mono);
-  font-size: 10px;
+  font-size: 11px;
   color: var(--muted);
   white-space: nowrap;
 }
@@ -351,7 +351,7 @@ body {
 .item__body {
   margin-top: 5px;
   color: var(--text);
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1.5;
   opacity: 0.8;
 }
@@ -441,7 +441,7 @@ body {
 /* ========== EMPTY STATES ========== */
 .empty {
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: 12px;
   color: var(--muted);
   padding: 12px;
   font-style: italic;
