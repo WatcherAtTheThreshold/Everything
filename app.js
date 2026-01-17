@@ -492,10 +492,14 @@ function renderWeekView() {
   const container = $("#weekView");
   container.innerHTML = "";
 
-  for (const day of weekDays) {
-    const dayItems = ALL.filter(it => 
-      it.scheduledDay === day.name && !it.done && matchesFilter(it)
-    ).sort((a,b) => (a.createdAt||"").localeCompare(b.createdAt||""));
+for (const day of weekDays) {
+  // Get ALL items for this day (don't filter yet)
+  const allDayItems = ALL.filter(it => 
+    it.scheduledDay === day.name && !it.done
+  ).sort((a,b) => (a.createdAt||"").localeCompare(b.createdAt||""));
+  
+  // Then filter for display
+  const dayItems = allDayItems.filter(matchesFilter);
 
     const isToday = day.name === today;
     const isExpanded = EXPANDED_DAYS.has(day.name);
@@ -520,9 +524,15 @@ function renderWeekView() {
     const itemsContainer = document.createElement("div");
     itemsContainer.className = "day__items";
     
-    if (dayItems.length === 0) {
-      itemsContainer.innerHTML = '<div class="day__empty">No tasks scheduled</div>';
-    } else {
+   const hasFilter = FILTER_TEXT !== "" || ACTIVE_TAGS.size > 0;
+
+if (dayItems.length === 0 && !hasFilter) {
+  // No items at all on this day
+  itemsContainer.innerHTML = '<div class="day__empty">No tasks scheduled</div>';
+} else if (dayItems.length === 0 && hasFilter) {
+  // Items exist but none match filter
+  itemsContainer.innerHTML = '<div class="day__empty">No matches for current filter</div>';
+} else {
       for (const item of dayItems) {
         itemsContainer.appendChild(renderItemCard(item, { compact: true }));
       }
