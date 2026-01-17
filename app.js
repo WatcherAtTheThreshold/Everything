@@ -1,7 +1,8 @@
-/* Everything Console — scaffold
-   - Notes + Projects stored in IndexedDB
-   - Alerts are computed (due/stale)
-   - Export/Import JSON for snapshots
+/* Everything Console v2 — Two-pane with week view
+   - Notes + Projects + Scheduled items in IndexedDB
+   - Week view with collapsible days
+   - Auto-schedule with day prefixes (monday:, tue:, etc.)
+   - Alerts computed, Recent log chronological
 */
 
 const DB_NAME = "everything_console_db";
@@ -14,7 +15,7 @@ const nowISO = () => new Date().toISOString();
 const fmt = (iso) => {
   try {
     const d = new Date(iso);
-    return d.toLocaleString(undefined, {  day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
+    return d.toLocaleString(undefined, { year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" });
   } catch { return iso; }
 };
 
@@ -24,14 +25,13 @@ function extractTags(text) {
 }
 
 function parseDue(text) {
-  // due:YYYY-MM-DD (simple)
-  const m = text.match(/due:(\d{2}-\d{2}-\d{4})/i);
+  const m = text.match(/due:(\d{4}-\d{2}-\d{2})/i);
   if (!m) return null;
-  const d = new Date(m[1] + "T09:00:00"); // local-ish
+  const d = new Date(m[1] + "T09:00:00");
   return isNaN(d.getTime()) ? null : d.toISOString();
 }
 
-function shortBody(text, max = 220) {
+function shortBody(text, max = 180) {
   const s = (text || "").trim();
   if (s.length <= max) return s;
   return s.slice(0, max - 1) + "…";
@@ -45,15 +45,97 @@ function systemStateFrom(alertCount) {
 
 function setPill(el, label, cls) {
   el.textContent = label;
-  el.style.borderColor = cls === "bad" ? "rgba(255,142,142,.45)"
-    : cls === "warn" ? "rgba(255,211,138,.45)"
-    : "rgba(166,255,191,.40)";
-  el.style.background = cls === "bad" ? "rgba(255,142,142,.10)"
-    : cls === "warn" ? "rgba(255,211,138,.10)"
-    : "rgba(166,255,191,.08)";
+  el.style.borderColor = cls === "bad" ? "rgba(184,92,92,.45)"
+    : cls === "warn" ? "rgba(166,124,82,.45)"
+    : "rgba(90,143,111,.40)";
+  el.style.background = cls === "bad" ? "rgba(184,92,92,.10)"
+    : cls === "warn" ? "rgba(166,124,82,.10)"
+    : "rgba(90,143,111,.08)";
 }
 
-// ---------- IndexedDB minimal wrapper ----------
+function escapeHtml(s) {
+  return (s ?? "").toString()
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+
+// ---------- Week utilities ----------
+function getWeekBounds(date = new Date()) {
+  // Get current week (Monday-Sunday)
+  const d = new Date(date);
+  const day = d.getDay();
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Adjust for Sunday
+  const monday = new Date(d.setDate(diff));
+  monday.setHours(0, 0, 0, 0);
+  
+  const sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 6);
+  sunday.setHours(23, 59, 59, 999);
+  
+  return { monday, sunday };
+}
+
+function getDayOfWeek(date) {
+  const days = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+  return days[new Date(date).getDay()];
+}
+
+function getTodayDayName() {
+  return getDayOfWeek(new Date());
+}
+
+function parseDay(text) {
+  // Check for day prefix: "monday: task" or "mon: task"
+  const dayMap = {
+    'mon': 'monday', 'monday': 'monday',
+    'tue': 'tuesday', 'tues': 'tuesday', 'tuesday': 'tuesday',
+    'wed': 'wednesday', 'wednesday': 'wednesday',
+    'thu': 'thursday', 'thur': 'thursday', 'thurs': 'thursday', 'thursday': 'thursday',
+    'fri': 'friday', 'friday': 'friday',
+    'sat': 'saturday', 'saturday': 'saturday',
+    'sun': 'sunday', 'sunday': 'sunday'
+  };
+  
+  for (const [abbr, full] of Object.entries(dayMap)) {
+    const regex = new RegExp(`^${abbr}:\\s*`, 'i');
+    if (regex.test(text)) {
+      return { day: full, text: text.replace(regex, '') };
+    }
+  }
+  
+  return null;
+}
+
+function getWeekDays() {
+  const { monday } = getWeekBounds();
+  const days = [];
+  const dayNames = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+  
+  for (let i = 0; i < 7; i++) {
+    const date = new Date(monday);
+    date.setDate(monday.getDate() + i);
+    days.push({
+      name: dayNames[i],
+      date: date,
+      dateStr: date.toISOString().split('T')[0],
+      display: date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
+    });
+  }
+  
+  return days;
+}
+
+function formatWeekRange() {
+  const { monday, sunday } = getWeekBounds();
+  const monStr = monday.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  const sunStr = sunday.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+  return `${monStr} – ${sunStr}`;
+}
+
+// ---------- IndexedDB ----------
 function openDB() {
   return new Promise((resolve, reject) => {
     const req = indexedDB.open(DB_NAME, DB_VERSION);
@@ -64,6 +146,7 @@ function openDB() {
         os.createIndex("type", "type", { unique: false });
         os.createIndex("updatedAt", "updatedAt", { unique: false });
         os.createIndex("createdAt", "createdAt", { unique: false });
+        os.createIndex("scheduledDay", "scheduledDay", { unique: false });
       }
     };
     req.onsuccess = () => resolve(req.result);
@@ -114,79 +197,112 @@ async function dbClear() {
 
 // ---------- App state ----------
 let ALL = [];
-let FILTER = "";
+let EXPANDED_DAYS = new Set([getTodayDayName()]); // Today expanded by default
 
-// ---------- Rendering ----------
-function render() {
-  const filterText = FILTER.trim().toLowerCase();
+// ---------- Create / Edit ----------
+function makeId() {
+  return "id_" + crypto.getRandomValues(new Uint32Array(2)).join("_");
+}
 
-  const filtered = ALL.filter(it => {
-    if (!filterText) return true;
-    const hay = `${it.type} ${it.title} ${it.body} ${(it.tags || []).join(" ")}`.toLowerCase();
-    return hay.includes(filterText);
-  });
+async function addItem(text) {
+  const raw = (text || "").trim();
+  if (!raw) return;
 
-  const notes = filtered.filter(i => i.type === "note").sort((a,b) => (b.updatedAt||"").localeCompare(a.updatedAt||""));
-  const projects = filtered.filter(i => i.type === "project").sort((a,b) => (b.updatedAt||"").localeCompare(a.updatedAt||""));
-
-  $("#inboxCount").textContent = String(notes.length);
-
-  // Alerts (computed)
-  const alerts = computeAlerts(ALL);
-  $("#alertCount").textContent = String(alerts.length);
-  const st = systemStateFrom(alerts.length);
-  setPill($("#systemState"), st.label, st.cls);
-
-  $("#alerts").innerHTML = alerts.length ? "" : `<div class="micro">No alerts. System stable.</div>`;
-  for (const a of alerts.slice(0, 8)) {
-    $("#alerts").appendChild(renderItemCard(a, { isAlert:true }));
+  const createdAt = nowISO();
+  let type = "note"; // default
+  let title = "";
+  let body = raw;
+  let scheduledDay = null; // for week scheduling
+  
+  // Check for day prefix
+  const dayParse = parseDay(raw);
+  if (dayParse) {
+    scheduledDay = dayParse.day;
+    body = dayParse.text;
+    type = "task"; // scheduled items are tasks
   }
 
-  // Radar: last touched across all types
-  const radar = [...ALL].sort((a,b)=> (b.updatedAt||"").localeCompare(a.updatedAt||"")).slice(0, 6);
-  $("#radar").innerHTML = radar.length ? "" : `<div class="micro">Nothing yet. Add a note above.</div>`;
-  for (const it of radar) $("#radar").appendChild(renderItemCard(it));
+  // Check for command prefixes
+  if (body.toLowerCase().startsWith("/project")) {
+    type = "project";
+    body = body.replace(/^\/project\s*/i, "").trim();
+  } else if (body.toLowerCase().startsWith("/task")) {
+    type = "task";
+    body = body.replace(/^\/task\s*/i, "").trim();
+  } else if (body.toLowerCase().startsWith("/note")) {
+    type = "note";
+    body = body.replace(/^\/note\s*/i, "").trim();
+  }
 
-  // Projects/Notes lists
-  $("#projects").innerHTML = projects.length ? "" : `<div class="micro">No projects. Try <code>/project</code> in capture.</div>`;
-  for (const it of projects.slice(0, 20)) $("#projects").appendChild(renderItemCard(it));
+  const tags = extractTags(body);
+  const dueAt = parseDue(body);
 
-  $("#notes").innerHTML = notes.length ? "" : `<div class="micro">No notes.</div>`;
-  for (const it of notes.slice(0, 30)) $("#notes").appendChild(renderItemCard(it));
+  // Title heuristic
+  const lines = body.split("\n");
+  const first = lines[0].trim();
+  title = first.length > 0 && first.length <= 60 ? first : `${type.toUpperCase()} • ${first.slice(0, 40)}…`;
+
+  const item = {
+    id: makeId(),
+    type,
+    title,
+    body,
+    tags,
+    createdAt,
+    updatedAt: createdAt,
+    dueAt,
+    scheduledDay, // null for notes, or day name for scheduled
+    done: false,
+  };
+
+  await dbPut(item);
+  await refresh();
 }
 
-function renderItemCard(item, opts = {}) {
-  const el = document.createElement("div");
-  el.className = "item";
+async function openEditor(id) {
+  const item = ALL.find(i => i.id === id);
+  if (!item) return;
 
-  const metaRight = opts.isAlert
-    ? (item.alertLabel || "ALERT")
-    : `${item.type.toUpperCase()} • ${fmt(item.updatedAt || item.createdAt)}`;
+  const action = prompt(
+    `EDIT: ${item.type.toUpperCase()}\n\n1) OK = edit body\n2) Type "done" to toggle done\n3) Type "delete" to remove\n\nCurrent body:`,
+    item.body || ""
+  );
 
-  const title = item.title || "(untitled)";
-  const body = item.body || "";
-  const tags = item.tags || [];
+  if (action === null) return;
 
-  el.innerHTML = `
-    <div class="item__top">
-      <div class="item__title">${escapeHtml(title)}</div>
-      <div class="item__meta">${escapeHtml(metaRight)}</div>
-    </div>
-    ${body ? `<div class="item__body">${escapeHtml(shortBody(body))}</div>` : ``}
-    ${tags.length ? `<div class="tags">${tags.map(t => `<span class="tag">${escapeHtml(t)}</span>`).join("")}</div>` : ``}
-  `;
+  const cmd = action.trim().toLowerCase();
+  if (cmd === "delete") {
+    await dbDelete(item.id);
+    await refresh();
+    return;
+  }
+  if (cmd === "done") {
+    item.done = !item.done;
+    item.updatedAt = nowISO();
+    await dbPut(item);
+    await refresh();
+    return;
+  }
 
-  el.addEventListener("click", () => openEditor(item.id));
-  return el;
-}
+  // Update body/tags/due
+  item.body = action;
+  item.tags = extractTags(action);
+  item.dueAt = parseDue(action);
+  item.updatedAt = nowISO();
 
-function escapeHtml(s) {
-  return (s ?? "").toString()
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#039;");
+  // Re-parse day if changed
+  const dayParse = parseDay(action);
+  if (dayParse) {
+    item.scheduledDay = dayParse.day;
+    item.body = dayParse.text;
+  }
+
+  // Update title
+  const first = (item.body.split("\n")[0] || "").trim();
+  if (first && first.length <= 80) item.title = first;
+
+  await dbPut(item);
+  await refresh();
 }
 
 // ---------- Alerts ----------
@@ -219,7 +335,7 @@ function computeAlerts(items) {
       }
     }
 
-    // Stale (projects especially, but applies to anything tagged #project or type project)
+    // Stale projects
     const isProjectish = it.type === "project" || (it.tags || []).includes("#project");
     if (isProjectish) {
       const ageDays = Math.floor((now - updated) / DAY);
@@ -233,100 +349,193 @@ function computeAlerts(items) {
     }
   }
 
-  // Sort: overdue first then stale
   const rank = (a) => (a.alertLabel?.includes("OVERDUE") ? 0 : a.alertLabel?.includes("DUE") ? 1 : 2);
   alerts.sort((a,b) => rank(a) - rank(b));
   return alerts;
 }
 
-// ---------- Create / Edit ----------
-function makeId() {
-  // simple unique id
-  return "id_" + crypto.getRandomValues(new Uint32Array(2)).join("_");
+// ---------- Rendering ----------
+function render() {
+  renderTopbar();
+  renderWeekView();
+  renderNotes();
+  renderAlerts();
+  renderProjects();
+  renderRecentLog();
 }
 
-async function addItem(type, text) {
-  const raw = (text || "").trim();
-  if (!raw) return;
-
-  const tags = extractTags(raw);
-  const dueAt = parseDue(raw);
-  const createdAt = nowISO();
-
-  // Title heuristic:
-  // - If first line is short, treat it as title; else synthesize
-  const lines = raw.split("\n");
-  const first = lines[0].trim();
-  let title = first.length <= 60 ? first : `${type.toUpperCase()} • ${first.slice(0, 40)}…`;
-
-  // Commands can override title
-  if (raw.toLowerCase().startsWith("/project")) {
-    type = "project";
-    title = first.replace(/^\/project\s*/i, "").trim() || "New Project";
-  }
-  if (raw.toLowerCase().startsWith("/task")) {
-    type = "task";
-    title = first.replace(/^\/task\s*/i, "").trim() || "New Task";
-  }
-
-  const item = {
-    id: makeId(),
-    type,
-    title,
-    body: raw,
-    tags,
-    createdAt,
-    updatedAt: createdAt,
-    dueAt,
-    done: false,
-    nextAction: type === "project" ? "" : undefined,
-  };
-
-  await dbPut(item);
-  await refresh();
+function renderTopbar() {
+  const alerts = computeAlerts(ALL);
+  $("#alertCount").textContent = String(alerts.length);
+  
+  const st = systemStateFrom(alerts.length);
+  setPill($("#systemState"), st.label, st.cls);
+  
+  // Week count: items scheduled this week
+  const weekItems = ALL.filter(it => it.scheduledDay && !it.done);
+  $("#weekCount").textContent = String(weekItems.length);
+  
+  $("#weekRange").textContent = formatWeekRange();
 }
 
-async function openEditor(id) {
-  const item = ALL.find(i => i.id === id);
-  if (!item) return;
+function renderWeekView() {
+  const weekDays = getWeekDays();
+  const today = getTodayDayName();
+  const container = $("#weekView");
+  container.innerHTML = "";
 
-  // Simple prompt-based editor for now (scaffold):
-  // - edit body
-  // - quick delete
-  // Upgrade later to a side-panel modal.
-  const action = prompt(
-    `EDIT: ${item.type.toUpperCase()}\n\n1) OK = edit body\n2) Type "done" to toggle done (tasks)\n3) Type "delete" to remove\n\nCurrent body:`,
-    item.body || ""
-  );
+  for (const day of weekDays) {
+    const dayItems = ALL.filter(it => 
+      it.scheduledDay === day.name && !it.done
+    ).sort((a,b) => (a.createdAt||"").localeCompare(b.createdAt||""));
 
-  if (action === null) return;
+    const isToday = day.name === today;
+    const isExpanded = EXPANDED_DAYS.has(day.name);
 
-  const cmd = action.trim().toLowerCase();
-  if (cmd === "delete") {
-    await dbDelete(item.id);
-    await refresh();
+    const dayEl = document.createElement("div");
+    dayEl.className = `day ${isToday ? 'day--today' : ''} ${isExpanded ? 'day--expanded' : ''}`;
+
+    const header = document.createElement("div");
+    header.className = "day__header";
+    header.innerHTML = `
+      <div class="day__left">
+        <span class="day__toggle">${isExpanded ? '▼' : '▶'}</span>
+        <span class="day__name">${day.name}</span>
+        <span class="day__date">${day.display}</span>
+      </div>
+      <span class="day__count">${dayItems.length}</span>
+    `;
+    
+    header.addEventListener("click", () => toggleDay(day.name));
+    dayEl.appendChild(header);
+
+    const itemsContainer = document.createElement("div");
+    itemsContainer.className = "day__items";
+    
+    if (dayItems.length === 0) {
+      itemsContainer.innerHTML = '<div class="day__empty">No tasks scheduled</div>';
+    } else {
+      for (const item of dayItems) {
+        itemsContainer.appendChild(renderItemCard(item, { compact: true }));
+      }
+    }
+    
+    dayEl.appendChild(itemsContainer);
+    container.appendChild(dayEl);
+  }
+}
+
+function toggleDay(dayName) {
+  if (EXPANDED_DAYS.has(dayName)) {
+    EXPANDED_DAYS.delete(dayName);
+  } else {
+    EXPANDED_DAYS.add(dayName);
+  }
+  renderWeekView();
+}
+
+function renderNotes() {
+  // Atemporal notes (not scheduled to a day)
+  const notes = ALL.filter(it => 
+    it.type === "note" && !it.scheduledDay
+  ).sort((a,b) => (b.updatedAt||"").localeCompare(a.updatedAt||""));
+
+  const container = $("#notesList");
+  if (notes.length === 0) {
+    container.innerHTML = '<div class="empty">No notes yet. Start capturing ideas above.</div>';
     return;
   }
-  if (cmd === "done") {
-    item.done = !item.done;
-    item.updatedAt = nowISO();
-    await dbPut(item);
-    await refresh();
+
+  container.innerHTML = "";
+  for (const note of notes.slice(0, 20)) {
+    container.appendChild(renderItemCard(note));
+  }
+}
+
+function renderAlerts() {
+  const alerts = computeAlerts(ALL);
+  const container = $("#alerts");
+  
+  if (alerts.length === 0) {
+    container.innerHTML = '<div class="empty">No alerts. System stable.</div>';
     return;
   }
 
-  // Update body/title/tags/due
-  item.body = action;
-  item.tags = extractTags(action);
-  item.dueAt = parseDue(action);
-  item.updatedAt = nowISO();
+  container.innerHTML = "";
+  for (const alert of alerts.slice(0, 6)) {
+    container.appendChild(renderItemCard(alert, { 
+      compact: true, 
+      isAlert: true 
+    }));
+  }
+}
 
-  // update title heuristic again
-  const first = (action.split("\n")[0] || "").trim();
-  if (first && first.length <= 80) item.title = first;
+function renderProjects() {
+  const projects = ALL.filter(it => it.type === "project")
+    .sort((a,b) => (b.updatedAt||"").localeCompare(a.updatedAt||""));
 
-  await dbPut(item);
-  await refresh();
+  const container = $("#projects");
+  if (projects.length === 0) {
+    container.innerHTML = '<div class="empty">No projects. Use /project to create one.</div>';
+    return;
+  }
+
+  container.innerHTML = "";
+  for (const proj of projects.slice(0, 10)) {
+    container.appendChild(renderItemCard(proj, { compact: true }));
+  }
+}
+
+function renderRecentLog() {
+  // All items sorted chronologically (most recent first)
+  // This is the "dev log" view
+  const recent = [...ALL]
+    .sort((a,b) => (b.createdAt||"").localeCompare(a.createdAt||""));
+
+  const container = $("#recentLog");
+  if (recent.length === 0) {
+    container.innerHTML = '<div class="empty">No entries yet.</div>';
+    return;
+  }
+
+  container.innerHTML = "";
+  for (const item of recent.slice(0, 8)) {
+    container.appendChild(renderItemCard(item, { 
+      compact: true,
+      showDate: true 
+    }));
+  }
+}
+
+function renderItemCard(item, opts = {}) {
+  const el = document.createElement("div");
+  el.className = "item";
+
+  let metaRight = "";
+  if (opts.isAlert) {
+    metaRight = item.alertLabel || "ALERT";
+  } else if (opts.showDate) {
+    const d = new Date(item.createdAt);
+    metaRight = d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  } else {
+    metaRight = item.type.toUpperCase();
+  }
+
+  const title = item.title || "(untitled)";
+  const body = opts.compact ? "" : (item.body || "");
+  const tags = item.tags || [];
+
+  el.innerHTML = `
+    <div class="item__top">
+      <div class="item__title">${escapeHtml(title)}</div>
+      <div class="item__meta">${escapeHtml(metaRight)}</div>
+    </div>
+    ${body && !opts.compact ? `<div class="item__body">${escapeHtml(shortBody(body))}</div>` : ``}
+    ${tags.length && !opts.compact ? `<div class="tags">${tags.map(t => `<span class="tag">${escapeHtml(t)}</span>`).join("")}</div>` : ``}
+  `;
+
+  el.addEventListener("click", () => openEditor(item.id));
+  return el;
 }
 
 // ---------- Backup / Restore ----------
@@ -345,8 +554,8 @@ function downloadJSON(obj, filename = "everything-console-backup.json") {
 async function exportAll() {
   const payload = {
     exportedAt: nowISO(),
-    app: "everything-console",
-    version: 1,
+    app: "everything-console-v2",
+    version: 2,
     items: ALL,
   };
   downloadJSON(payload);
@@ -356,7 +565,7 @@ async function importAll(file) {
   const text = await file.text();
   const json = JSON.parse(text);
   const items = Array.isArray(json.items) ? json.items : [];
-  // Merge strategy: upsert by id
+  
   for (const it of items) {
     if (!it.id) it.id = makeId();
     if (!it.createdAt) it.createdAt = nowISO();
@@ -368,27 +577,46 @@ async function importAll(file) {
 
 // ---------- Seed ----------
 async function seedDemo() {
+  const today = getTodayDayName();
+  const tomorrow = {
+    'monday': 'tuesday',
+    'tuesday': 'wednesday',
+    'wednesday': 'thursday',
+    'thursday': 'friday',
+    'friday': 'saturday',
+    'saturday': 'sunday',
+    'sunday': 'monday'
+  }[today];
+
   const demo = [
     {
-      type:"project",
-      title:"Cruxfade — polish pass",
-      body:"Cruxfade — polish pass\n\nNext: slow battle pacing a touch, add damage float.\nTags: #cruxfade #ui #project",
-      tags:["#cruxfade","#ui","#project"],
-      nextAction:"slow pacing + damage float",
+      type: "project",
+      title: "Cruxfade — polish pass",
+      body: "Cruxfade — polish pass\n\nNext: slow battle pacing a touch, add damage float.\nTags: #cruxfade #ui #project",
+      tags: ["#cruxfade", "#ui", "#project"],
+      scheduledDay: null,
     },
     {
-      type:"note",
-      title:"Coherence vibe idea",
-      body:"Coherence vibe idea\n\nMinimal grid + microtext + calm motion. Busy enough to be eye-entertaining.\n#design #dashboard",
-      tags:["#design","#dashboard"],
+      type: "note",
+      title: "Coherence vibe idea",
+      body: "Coherence vibe idea\n\nMinimal grid + microtext + calm motion. Busy enough to be eye-entertaining.\n#design #dashboard",
+      tags: ["#design", "#dashboard"],
+      scheduledDay: null,
     },
     {
-      type:"task",
-      title:"Print new bookmarks",
-      body:"/task Print new bookmarks due:2026-01-20\n\nRemember to bring display stand.\n#fairweather #prints",
-      tags:["#fairweather","#prints"],
-      dueAt: new Date("2026-01-20T09:00:00").toISOString(),
-      done:false
+      type: "task",
+      title: "Review weekly goals",
+      body: "Review weekly goals and update project timelines",
+      tags: ["#planning"],
+      scheduledDay: today,
+    },
+    {
+      type: "task",
+      title: "Print new bookmarks",
+      body: "Remember to bring display stand.\n#fairweather #prints",
+      tags: ["#fairweather", "#prints"],
+      dueAt: new Date(Date.now() + 4 * 24 * 60 * 60 * 1000).toISOString(),
+      scheduledDay: tomorrow,
     }
   ];
 
@@ -403,8 +631,8 @@ async function seedDemo() {
       createdAt,
       updatedAt: createdAt,
       dueAt: d.dueAt || null,
-      done: d.done || false,
-      nextAction: d.nextAction || "",
+      scheduledDay: d.scheduledDay || null,
+      done: false,
     });
   }
   await refresh();
@@ -423,19 +651,13 @@ function tickClock() {
 
 // ---------- Events ----------
 function wireUI() {
-  $("#btnSaveNote").addEventListener("click", async () => {
-    await addItem("note", $("#captureInput").value);
-    $("#captureInput").value = "";
-  });
-
-  $("#btnSaveProject").addEventListener("click", async () => {
-    await addItem("project", "/project " + $("#captureInput").value);
-    $("#captureInput").value = "";
-  });
-
-  $("#filterInput").addEventListener("input", (e) => {
-    FILTER = e.target.value;
-    render();
+  // Capture: Enter saves
+  $("#captureInput").addEventListener("keydown", async (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      await addItem($("#captureInput").value);
+      $("#captureInput").value = "";
+    }
   });
 
   $("#btnExport").addEventListener("click", exportAll);
@@ -450,19 +672,10 @@ function wireUI() {
   $("#btnSeed").addEventListener("click", seedDemo);
 
   $("#btnWipe").addEventListener("click", async () => {
-    const ok = confirm("Wipe local data for Everything Console on this browser? (Cannot be undone unless you exported.)");
+    const ok = confirm("Wipe all local data? (Cannot be undone unless you exported.)");
     if (!ok) return;
     await dbClear();
     await refresh();
-  });
-
-  // Capture: Enter saves note; Shift+Enter newline.
-  $("#captureInput").addEventListener("keydown", async (e) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      await addItem("note", $("#captureInput").value);
-      $("#captureInput").value = "";
-    }
   });
 }
 
@@ -470,9 +683,9 @@ async function boot() {
   wireUI();
   await refresh();
   tickClock();
-  setInterval(tickClock, 250);
+  setInterval(tickClock, 1000);
 
-  // Focus capture on load for “console” feel
+  // Focus capture
   setTimeout(() => $("#captureInput").focus(), 120);
 }
 
