@@ -1,0 +1,267 @@
+{
+  "exportedAt": "2026-01-17T04:37:10.596Z",
+  "app": "everything-console-v2",
+  "version": 2,
+  "items": [
+    {
+      "id": "id_1018926275_1497275759",
+      "type": "task",
+      "title": "Groceries",
+      "body": "Groceries",
+      "tags": [],
+      "createdAt": "2026-01-17T03:58:51.274Z",
+      "updatedAt": "2026-01-17T03:58:51.274Z",
+      "dueAt": null,
+      "scheduledDay": "monday",
+      "done": false
+    },
+    {
+      "id": "id_1151514050_1893701671",
+      "type": "note",
+      "title": "NOTE • Can Beep save and reference the last inp…",
+      "body": "Can Beep save and reference the last input to keep a simple 2-way conversation? #beep #web-app",
+      "tags": [
+        "#beep",
+        "#web-app"
+      ],
+      "createdAt": "2026-01-16T16:46:01.403Z",
+      "updatedAt": "2026-01-16T16:46:01.403Z",
+      "dueAt": null,
+      "done": false
+    },
+    {
+      "id": "id_1654676798_3184178026",
+      "type": "note",
+      "title": "Webpage redo for portal to Etsy shop to sell our prints. #fairweather #prints",
+      "body": "Webpage redo for portal to Etsy shop to sell our prints. #fairweather #prints",
+      "tags": [
+        "#fairweather",
+        "#prints"
+      ],
+      "createdAt": "2026-01-17T02:21:37.643Z",
+      "updatedAt": "2026-01-17T02:22:46.423Z",
+      "dueAt": null,
+      "done": false
+    },
+    {
+      "id": "id_241094458_249049277",
+      "type": "note",
+      "title": "NOTE • Distortion spread tuning - Growth is too…",
+      "body": "Distortion spread tuning - Growth is too aggresive, maybe switch to one distortion spread per cycle. #coherence #mechanic",
+      "tags": [
+        "#coherence",
+        "#mechanic"
+      ],
+      "createdAt": "2026-01-16T21:53:41.151Z",
+      "updatedAt": "2026-01-16T21:53:41.151Z",
+      "dueAt": null,
+      "done": false
+    },
+    {
+      "id": "id_2923587510_2370112788",
+      "type": "task",
+      "title": "Coherence Prototype",
+      "body": "Coherence Prototype",
+      "tags": [],
+      "createdAt": "2026-01-17T04:01:36.570Z",
+      "updatedAt": "2026-01-17T04:01:36.570Z",
+      "dueAt": null,
+      "scheduledDay": "thursday",
+      "done": false
+    },
+    {
+      "id": "id_2924315449_1341021272",
+      "type": "task",
+      "title": "Everything — Console - Idea to Build",
+      "body": "Everything — Console - Idea to Build",
+      "tags": [],
+      "createdAt": "2026-01-17T04:03:18.145Z",
+      "updatedAt": "2026-01-17T04:03:42.519Z",
+      "dueAt": null,
+      "scheduledDay": "friday",
+      "done": false
+    },
+    {
+      "id": "id_3155820726_1704023053",
+      "type": "task",
+      "title": "Dump",
+      "body": "Dump",
+      "tags": [],
+      "createdAt": "2026-01-17T03:59:32.898Z",
+      "updatedAt": "2026-01-17T03:59:32.898Z",
+      "dueAt": null,
+      "scheduledDay": "tuesday",
+      "done": false
+    },
+    {
+      "id": "id_3275270099_3932856751",
+      "type": "note",
+      "title": "NOTE • Come up with some more artifact ideas - …",
+      "body": "Come up with some more artifact ideas - #coherence #mechanics",
+      "tags": [
+        "#coherence",
+        "#mechanics"
+      ],
+      "createdAt": "2026-01-16T21:54:52.678Z",
+      "updatedAt": "2026-01-16T21:54:52.678Z",
+      "dueAt": null,
+      "done": false
+    },
+    {
+      "id": "id_3281820021_3084880899",
+      "type": "project",
+      "title": "Everything — Console project tracker #web-app #everything",
+      "body": "Everything — Console project tracker #web-app #everything",
+      "tags": [
+        "#web-app",
+        "#everything"
+      ],
+      "createdAt": "2026-01-17T04:06:17.449Z",
+      "updatedAt": "2026-01-17T04:06:50.184Z",
+      "dueAt": null,
+      "scheduledDay": null,
+      "done": false
+    },
+    {
+      "id": "id_341014172_2423732674",
+      "type": "note",
+      "title": "NOTE • Should there be a tutorial? or just a ke…",
+      "body": "Should there be a tutorial? or just a key for color blocks? Or is it about learning through run experimentation? #coherence #UI",
+      "tags": [
+        "#coherence",
+        "#ui"
+      ],
+      "createdAt": "2026-01-16T21:58:19.829Z",
+      "updatedAt": "2026-01-16T21:58:19.829Z",
+      "dueAt": null,
+      "done": false
+    },
+    {
+      "id": "id_3437422874_1055978406",
+      "type": "task",
+      "title": "Print new bookmarks",
+      "body": "/task Print new bookmarks due:2026-01-20\n\nRemember to bring display stand.\n#fairweather #prints",
+      "tags": [
+        "#fairweather",
+        "#prints"
+      ],
+      "createdAt": "2026-01-16T16:31:57.224Z",
+      "updatedAt": "2026-01-16T16:31:57.224Z",
+      "dueAt": "2026-01-20T14:00:00.000Z",
+      "done": false,
+      "nextAction": ""
+    },
+    {
+      "id": "id_3579509855_3736628136",
+      "type": "note",
+      "title": "NOTE • Would Beep work better run on a local Ol…",
+      "body": "Would Beep work better run on a local Ollama agent? Would that be web accesible for Bronwyns iPad or only local to my PC? #beep #web-app",
+      "tags": [
+        "#beep",
+        "#web-app"
+      ],
+      "createdAt": "2026-01-16T16:48:48.546Z",
+      "updatedAt": "2026-01-16T16:48:48.546Z",
+      "dueAt": null,
+      "done": false
+    },
+    {
+      "id": "id_364402564_2467294975",
+      "type": "project",
+      "title": "Beep - A talking robot teacher for Bronwyn. A voice to text and text to voice interface to communicate with. Running on an openAI agent. #beep #web-app",
+      "body": "/project Beep - A talking robot teacher for Bronwyn. A voice to text and text to voice interface to communicate with. Running on an openAI agent. #beep #web-app",
+      "tags": [
+        "#beep",
+        "#web-app"
+      ],
+      "createdAt": "2026-01-16T16:43:35.316Z",
+      "updatedAt": "2026-01-16T16:43:35.316Z",
+      "dueAt": null,
+      "done": false,
+      "nextAction": ""
+    },
+    {
+      "id": "id_376590330_3993055543",
+      "type": "task",
+      "title": "Out to Lunch",
+      "body": "Out to Lunch",
+      "tags": [],
+      "createdAt": "2026-01-17T03:59:16.699Z",
+      "updatedAt": "2026-01-17T03:59:16.699Z",
+      "dueAt": null,
+      "scheduledDay": "monday",
+      "done": false
+    },
+    {
+      "id": "id_3952006622_309134530",
+      "type": "task",
+      "title": "Started Coherence - Brainstorming non-violent rogue-like",
+      "body": "Started Coherence - Brainstorming non-violent rogue-like",
+      "tags": [],
+      "createdAt": "2026-01-17T04:00:41.514Z",
+      "updatedAt": "2026-01-17T04:00:41.514Z",
+      "dueAt": null,
+      "scheduledDay": "wednesday",
+      "done": false
+    },
+    {
+      "id": "id_4226845053_330065872",
+      "type": "project",
+      "title": "/project Coherence #coherence #game due:1-23-2026",
+      "body": "/project Coherence #coherence #game due:1-23-2026",
+      "tags": [
+        "#coherence",
+        "#game"
+      ],
+      "createdAt": "2026-01-16T16:21:23.146Z",
+      "updatedAt": "2026-01-17T02:39:42.782Z",
+      "dueAt": null,
+      "done": false,
+      "nextAction": ""
+    },
+    {
+      "id": "id_606709927_966186287",
+      "type": "note",
+      "title": "Coherence vibe idea",
+      "body": "Coherence vibe idea\n\nMinimal grid + microtext + calm motion. Busy enough to be eye-entertaining.\n#design #dashboard",
+      "tags": [
+        "#design",
+        "#dashboard"
+      ],
+      "createdAt": "2026-01-16T16:31:57.223Z",
+      "updatedAt": "2026-01-16T16:31:57.223Z",
+      "dueAt": null,
+      "done": false,
+      "nextAction": ""
+    },
+    {
+      "id": "id_906206172_3954853455",
+      "type": "project",
+      "title": "Fairweather Prints - Online sales",
+      "body": "/project Fairweather Prints - Online sales Printing and selling prints of our paintings #fairweather #prints due:2-1-2026",
+      "tags": [
+        "#fairweather",
+        "#prints"
+      ],
+      "createdAt": "2026-01-17T02:20:12.430Z",
+      "updatedAt": "2026-01-17T02:39:07.861Z",
+      "dueAt": null,
+      "done": false,
+      "nextAction": ""
+    },
+    {
+      "id": "id_908648893_2065066441",
+      "type": "note",
+      "title": "NOTE • Create map-2 & map-3 #coherence #game",
+      "body": "NOTE • Create map-2 & map-3 #coherence #game",
+      "tags": [
+        "#coherence",
+        "#game"
+      ],
+      "createdAt": "2026-01-16T22:08:16.698Z",
+      "updatedAt": "2026-01-16T22:08:16.698Z",
+      "dueAt": null,
+      "done": false
+    }
+  ]
+}
