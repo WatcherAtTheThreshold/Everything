@@ -491,23 +491,17 @@ function renderWeekView() {
   const today = getTodayDayName();
   const container = $("#weekView");
   container.innerHTML = "";
-
-for (const item of dayItems) {
-  const card = renderItemCard(item, { compact: true });
-  if (hasFilter) {
-    card.classList.add('item--match');
-  }
-  itemsContainer.appendChild(card);
-}
-
-for (const day of weekDays) {
-  // Get ALL items for this day (don't filter yet)
-  const allDayItems = ALL.filter(it => 
-    it.scheduledDay === day.name && !it.done
-  ).sort((a,b) => (a.createdAt||"").localeCompare(b.createdAt||""));
   
-  // Then filter for display
-  const dayItems = allDayItems.filter(matchesFilter);
+  const hasFilter = FILTER_TEXT !== "" || ACTIVE_TAGS.size > 0;
+
+  for (const day of weekDays) {
+    // Get ALL items for this day (don't filter yet)
+    const allDayItems = ALL.filter(it => 
+      it.scheduledDay === day.name && !it.done
+    ).sort((a,b) => (a.createdAt||"").localeCompare(b.createdAt||""));
+    
+    // Then filter for display
+    const dayItems = allDayItems.filter(matchesFilter);
 
     const isToday = day.name === today;
     const isExpanded = EXPANDED_DAYS.has(day.name);
@@ -532,17 +526,19 @@ for (const day of weekDays) {
     const itemsContainer = document.createElement("div");
     itemsContainer.className = "day__items";
     
-   const hasFilter = FILTER_TEXT !== "" || ACTIVE_TAGS.size > 0;
-
-if (dayItems.length === 0 && !hasFilter) {
-  // No items at all on this day
-  itemsContainer.innerHTML = '<div class="day__empty">No tasks scheduled</div>';
-} else if (dayItems.length === 0 && hasFilter) {
-  // Items exist but none match filter
-  itemsContainer.innerHTML = '<div class="day__empty">No matches for current filter</div>';
-} else {
+    if (dayItems.length === 0 && !hasFilter) {
+      // No items at all on this day
+      itemsContainer.innerHTML = '<div class="day__empty">No tasks scheduled</div>';
+    } else if (dayItems.length === 0 && hasFilter) {
+      // Items exist but none match filter
+      itemsContainer.innerHTML = '<div class="day__empty">No matches for current filter</div>';
+    } else {
       for (const item of dayItems) {
-        itemsContainer.appendChild(renderItemCard(item, { compact: true }));
+        const card = renderItemCard(item, { compact: true });
+        if (hasFilter) {
+          card.classList.add('item--match');
+        }
+        itemsContainer.appendChild(card);
       }
     }
     
