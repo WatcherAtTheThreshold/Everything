@@ -69,6 +69,57 @@ function escapeHtml(s) {
 
 // ---------- Week utilities ----------
 function getWeekBounds(date = new Date()) {
+
+// ---------- Filter utilities ----------
+function getAllTags() {
+  const tagSet = new Set();
+  for (const item of ALL) {
+    if (item.tags) {
+      for (const tag of item.tags) {
+        tagSet.add(tag);
+      }
+    }
+  }
+  return Array.from(tagSet).sort();
+}
+
+function matchesFilter(item) {
+  // If no filter, show everything
+  if (FILTER_TEXT === "" && ACTIVE_TAGS.size === 0) return true;
+  
+  const searchText = FILTER_TEXT.toLowerCase();
+  const itemText = `${item.type} ${item.title} ${item.body} ${(item.tags || []).join(" ")}`.toLowerCase();
+  
+  // Check text filter
+  const matchesText = searchText === "" || itemText.includes(searchText);
+  
+  // Check tag filters - item must have ALL active tags
+  let matchesTags = true;
+  if (ACTIVE_TAGS.size > 0) {
+    const itemTags = new Set(item.tags || []);
+    matchesTags = Array.from(ACTIVE_TAGS).every(tag => itemTags.has(tag));
+  }
+  
+  return matchesText && matchesTags;
+}
+
+function toggleTagFilter(tag) {
+  if (ACTIVE_TAGS.has(tag)) {
+    ACTIVE_TAGS.delete(tag);
+  } else {
+    ACTIVE_TAGS.add(tag);
+  }
+  render();
+}
+
+function clearFilter() {
+  FILTER_TEXT = "";
+  ACTIVE_TAGS.clear();
+  $("#filterInput").value = "";
+  render();
+}
+
+// ---------- Week utilities ----------
   // Get current week (Monday-Sunday)
   const d = new Date(date);
   const day = d.getDay();
@@ -203,6 +254,8 @@ async function dbClear() {
 // ---------- App state ----------
 let ALL = [];
 let EXPANDED_DAYS = new Set([getTodayDayName()]); // Today expanded by default
+let FILTER_TEXT = "";
+let ACTIVE_TAGS = new Set(); // Active tag filters
 
 // ---------- Create / Edit ----------
 function makeId() {
@@ -362,11 +415,31 @@ function computeAlerts(items) {
 // ---------- Rendering ----------
 function render() {
   renderTopbar();
+  renderTagChips();
   renderWeekView();
   renderNotes();
   renderAlerts();
   renderProjects();
   renderRecentLog();
+}
+
+function renderTagChips() {
+  const allTags = getAllTags();
+  const container = $("#tagChips");
+  
+  if (allTags.length === 0) {
+    container.innerHTML = "";
+    return;
+  }
+  
+  container.innerHTML = "";
+  for (const tag of allTags) {
+    const chip = document.createElement("button");
+    chip.className = `tag-chip ${ACTIVE_TAGS.has(tag) ? 'tag-chip--active' : ''}`;
+    chip.textContent = tag;
+    chip.addEventListener("click", () => toggleTagFilter(tag));
+    container.appendChild(chip);
+  }
 }
 
 function renderTopbar() {
@@ -391,7 +464,7 @@ function renderWeekView() {
 
   for (const day of weekDays) {
     const dayItems = ALL.filter(it => 
-      it.scheduledDay === day.name && !it.done
+      it.scheduledDay === day.name && !it.done && matchesFilter(it)
     ).sort((a,b) => (a.createdAt||"").localeCompare(b.createdAt||""));
 
     const isToday = day.name === today;
@@ -442,12 +515,15 @@ function toggleDay(dayName) {
 function renderNotes() {
   // Atemporal notes (not scheduled to a day)
   const notes = ALL.filter(it => 
-    it.type === "note" && !it.scheduledDay
+    it.type === "note" && !it.scheduledDay && matchesFilter(it)
   ).sort((a,b) => (b.updatedAt||"").localeCompare(a.updatedAt||""));
 
   const container = $("#notesList");
   if (notes.length === 0) {
-    container.innerHTML = '<div class="empty">No notes yet. Start capturing ideas above.</div>';
+    const msg = (FILTER_TEXT || ACTIVE_TAGS.size > 0) 
+      ? "No notes match filter." 
+      : "No notes yet. Start capturing ideas above.";
+    container.innerHTML = `<div class="empty">${msg}</div>`;
     return;
   }
 
@@ -458,11 +534,14 @@ function renderNotes() {
 }
 
 function renderAlerts() {
-  const alerts = computeAlerts(ALL);
+  const alerts = computeAlerts(ALL).filter(matchesFilter);
   const container = $("#alerts");
   
   if (alerts.length === 0) {
-    container.innerHTML = '<div class="empty">No alerts. System stable.</div>';
+    const msg = (FILTER_TEXT || ACTIVE_TAGS.size > 0) 
+      ? "No alerts match filter." 
+      : "No alerts. System stable.";
+    container.innerHTML = `<div class="empty">${msg}</div>`;
     return;
   }
 
@@ -476,12 +555,15 @@ function renderAlerts() {
 }
 
 function renderProjects() {
-  const projects = ALL.filter(it => it.type === "project")
+  const projects = ALL.filter(it => it.type === "project" && matchesFilter(it))
     .sort((a,b) => (b.updatedAt||"").localeCompare(a.updatedAt||""));
 
   const container = $("#projects");
   if (projects.length === 0) {
-    container.innerHTML = '<div class="empty">No projects. Use /project to create one.</div>';
+    const msg = (FILTER_TEXT || ACTIVE_TAGS.size > 0) 
+      ? "No projects match filter." 
+      : "No projects. Use /project to create one.";
+    container.innerHTML = `<div class="empty">${msg}</div>`;
     return;
   }
 
@@ -494,12 +576,15 @@ function renderProjects() {
 function renderRecentLog() {
   // All items sorted chronologically (most recent first)
   // This is the "dev log" view
-  const recent = [...ALL]
+  const recent = ALL.filter(matchesFilter)
     .sort((a,b) => (b.createdAt||"").localeCompare(a.createdAt||""));
 
   const container = $("#recentLog");
   if (recent.length === 0) {
-    container.innerHTML = '<div class="empty">No entries yet.</div>';
+    const msg = (FILTER_TEXT || ACTIVE_TAGS.size > 0) 
+      ? "No entries match filter." 
+      : "No entries yet.";
+    container.innerHTML = `<div class="empty">${msg}</div>`;
     return;
   }
 
@@ -664,6 +749,15 @@ function wireUI() {
       $("#captureInput").value = "";
     }
   });
+
+  // Filter input
+  $("#filterInput").addEventListener("input", (e) => {
+    FILTER_TEXT = e.target.value.trim();
+    render();
+  });
+
+  // Clear filter button
+  $("#clearFilter").addEventListener("click", clearFilter);
 
   $("#btnExport").addEventListener("click", exportAll);
 
