@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Everything — Console</title>
+  <title>Everything — Console v2</title>
   <link rel="stylesheet" href="style.css" />
-  <!--<link rel="stylesheet" href="theme-day.css" />-->
 </head>
 <body>
   <header class="topbar">
@@ -24,8 +23,8 @@
         <span id="systemState" class="v pill">BOOT</span>
       </div>
       <div class="status__line">
-        <span class="k">INBOX</span>
-        <span id="inboxCount" class="v">0</span>
+        <span class="k">THIS WEEK</span>
+        <span id="weekCount" class="v">0</span>
       </div>
       <div class="status__line">
         <span class="k">ALERTS</span>
@@ -35,90 +34,108 @@
   </header>
 
   <main class="layout">
-    <section class="panel panel--wide">
-      <div class="panel__head">
-        <div class="panel__title">CAPTURE</div>
-        <div class="panel__meta">Enter to save • Shift+Enter newline • “/project …” to create project</div>
-      </div>
-
-      <div class="capture">
-        <textarea id="captureInput" spellcheck="false" placeholder="Type a note…  e.g.  fix battle pacing #cruxfade #ui"></textarea>
-        <div class="capture__row">
+    <!-- LEFT PANE: Working Space -->
+    <div class="pane pane--left">
+      
+      <!-- CAPTURE -->
+      <section class="panel">
+        <div class="panel__head">
+          <div class="panel__title">CAPTURE</div>
+          <div class="panel__meta">Enter to save • Shift+Enter newline</div>
+        </div>
+        <div class="capture">
+          <textarea id="captureInput" spellcheck="false" placeholder="Type a note… or 'monday: task' to schedule"></textarea>
           <div class="capture__hint">
-            Prefix commands: <code>/project</code>, <code>/task</code> • Tags: <code>#like-this</code> • Due: <code>due:1-20-2026</code>
-          </div>
-          <div class="capture__actions">
-            <button id="btnSaveNote" class="btn">Save Note</button>
-            <button id="btnSaveProject" class="btn btn--ghost">Save Project</button>
+            Day prefix: <code>monday:</code> <code>tue:</code> etc. • Tags: <code>#like-this</code> • Due: <code>due:2026-01-20</code> • <code>/project</code> <code>/note</code>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <section class="panel">
-      <div class="panel__head">
-        <div class="panel__title">ALERTS</div>
-        <div class="panel__meta">computed • no push</div>
-      </div>
-      <div id="alerts" class="list"></div>
-    </section>
-
-    <section class="panel">
-      <div class="panel__head">
-        <div class="panel__title">RADAR</div>
-        <div class="panel__meta">recently touched</div>
-      </div>
-      <div id="radar" class="list"></div>
-    </section>
-
-    <section class="panel panel--wide">
-      <div class="panel__head">
-        <div class="panel__title">INDEX</div>
-        <div class="panel__meta">
-          <input id="filterInput" class="filter" placeholder="filter by tag or text… e.g. #cruxfade" />
+      <!-- FILTER -->
+      <section class="panel panel--filter">
+        <div class="filter-bar">
+          <input id="filterInput" class="filter-input" placeholder="Filter by tag or text..." spellcheck="false" />
+          <button id="clearFilter" class="btn-clear" title="Clear filter">×</button>
         </div>
-      </div>
+        <div id="tagChips" class="tag-chips"></div>
+      </section>
 
-      <div class="split">
-        <div>
-          <div class="subhead">PROJECTS</div>
-          <div id="projects" class="list"></div>
+      <!-- THIS WEEK -->
+      <section class="panel">
+        <div class="panel__head">
+          <div class="panel__title">THIS WEEK</div>
+          <div class="panel__meta" id="weekRange">Jan 13-19, 2026</div>
         </div>
+        <div id="weekView" class="week-view"></div>
+      </section>
 
-        <div>
-          <div class="subhead">NOTES</div>
-          <div id="notes" class="list"></div>
+      <!-- NOTES (atemporal) -->
+      <section class="panel">
+        <div class="panel__head">
+          <div class="panel__title">NOTES</div>
+          <div class="panel__meta">ideas & references</div>
         </div>
-      </div>
-    </section>
+        <div id="notesList" class="list"></div>
+      </section>
 
-    <section class="panel panel--wide">
-      <div class="panel__head">
-        <div class="panel__title">TOOLS</div>
-        <div class="panel__meta">backup / restore</div>
-      </div>
-      <div class="tools">
-        <button id="btnExport" class="btn">Export JSON</button>
-        <label class="btn btn--ghost">
-          Import JSON
-          <input id="importFile" type="file" accept="application/json" hidden />
-        </label>
-        <button id="btnSeed" class="btn btn--ghost">Seed Demo Data</button>
-        <button id="btnWipe" class="btn btn--danger">Wipe Local Data</button>
-        <div class="tools__note">
-          Data lives in your browser (IndexedDB). Export is your “commit-able snapshot.”
+    </div>
+
+    <!-- RIGHT PANE: Awareness / Meta -->
+    <div class="pane pane--right">
+      
+      <!-- ALERTS -->
+      <section class="panel panel--compact">
+        <div class="panel__head">
+          <div class="panel__title">ALERTS</div>
+          <div class="panel__meta">computed</div>
         </div>
-      </div>
-    </section>
+        <div id="alerts" class="list list--compact"></div>
+      </section>
 
-    <footer class="footer">
-      <div class="micro">
-        TIP: Click items to edit. Notes accept markdown-ish text but display plain. This is a scaffold — extend freely.
-      </div>
-    </footer>
+      <!-- PROJECTS -->
+      <section class="panel panel--compact">
+        <div class="panel__head">
+          <div class="panel__title">PROJECTS</div>
+          <div class="panel__meta">active</div>
+        </div>
+        <div id="projects" class="list list--compact"></div>
+      </section>
+
+      <!-- RECENT LOG -->
+      <section class="panel panel--compact">
+        <div class="panel__head">
+          <div class="panel__title">RECENT LOG</div>
+          <div class="panel__meta">chronological</div>
+        </div>
+        <div id="recentLog" class="list list--compact"></div>
+      </section>
+
+      <!-- TOOLS -->
+      <section class="panel panel--compact">
+        <div class="panel__head">
+          <div class="panel__title">TOOLS</div>
+          <div class="panel__meta">backup / restore</div>
+        </div>
+        <div class="tools">
+          <button id="btnExport" class="btn btn--sm">Export</button>
+          <label class="btn btn--sm btn--ghost">
+            Import
+            <input id="importFile" type="file" accept="application/json" hidden />
+          </label>
+          <button id="btnSeed" class="btn btn--sm btn--ghost">Seed</button>
+          <button id="btnWipe" class="btn btn--sm btn--danger">Wipe</button>
+        </div>
+      </section>
+
+    </div>
   </main>
 
-  <div class="bg-grid" aria-hidden="true"></div>
+  <footer class="footer">
+    <div class="micro">
+      TIP: Click items to edit. Use day prefixes like "monday: task" to schedule. This is your digital journal.
+    </div>
+  </footer>
+
   <script src="app.js"></script>
 </body>
 </html>
