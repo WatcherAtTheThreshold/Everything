@@ -67,9 +67,6 @@ function escapeHtml(s) {
     .replaceAll("'","&#039;");
 }
 
-// ---------- Week utilities ----------
-function getWeekBounds(date = new Date()) {
-
 // ---------- Filter utilities ----------
 function getAllTags() {
   const tagSet = new Set();
@@ -120,6 +117,7 @@ function clearFilter() {
 }
 
 // ---------- Week utilities ----------
+function getWeekBounds(date = new Date()) {
   // Get current week (Monday-Sunday)
   const d = new Date(date);
   const day = d.getDay();
