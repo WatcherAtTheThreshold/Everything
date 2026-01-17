@@ -1,10 +1,10 @@
 /* Day theme override — Markdown Editor vibe */
 :root{
-  --bg: #fbfaf8;
+  /*--bg: #fbfaf8;
   --panel: #ffffffcc;
   --panel2:#ffffff99;
 
-  --text:#141414;
+  --text:#141414;*/
   --muted:#6b6b6b;
   --line:#ece8e2;
 
@@ -16,26 +16,26 @@
   --shadow: 0 1px 10px rgba(0,0,0,.04);
 }
 
-/* Background: remove sci-fi gradients */
+/* Background: remove sci-fi gradients 
 body{
   background: var(--bg) !important;
   color: var(--text) !important;
-}
+}*/
 
-/* Kill the grid (or make it extremely faint) */
-.bg-grid{ opacity: 0 !important; }
+/* Kill the grid (or make it extremely faint) 
+.bg-grid{ opacity: 0 !important; }*/
 
-/* Panels: paper-like */
+/* Panels: paper-like 
 .panel{
   background: rgba(255,255,255,.78) !important;
   border-color: var(--line) !important;
-}
+}*/
 
-/* Topbar: match your Markdown Editor topbar feel */
+/* Topbar: match your Markdown Editor topbar feel 
 .topbar{
   background: rgba(251,250,248,.88) !important;
   border-bottom: 1px solid var(--line) !important;
-}
+}*/
 
 /* Inputs */
 #captureInput,
