@@ -293,10 +293,16 @@ async function addItem(text) {
   const tags = extractTags(body);
   const dueAt = parseDue(body);
 
-  // Title heuristic
+  // Title heuristic - use first line if reasonable length, otherwise truncate
   const lines = body.split("\n");
   const first = lines[0].trim();
-  title = first.length > 0 && first.length <= 60 ? first : `${type.toUpperCase()} • ${first.slice(0, 40)}…`;
+  if (first.length > 0 && first.length <= 80) {
+    title = first;
+  } else if (first.length > 80) {
+    title = first.slice(0, 77) + "…";
+  } else {
+    title = "(untitled)";
+  }
 
   const item = {
     id: makeId(),
@@ -342,12 +348,25 @@ async function openEditor(id) {
 
   // Update body/tags/due
   item.body = action;
-  item.tags = extractTags(action);
-  item.dueAt = parseDue(action);
+  
+  // Re-parse command prefixes if present
+  if (item.body.toLowerCase().startsWith("/project")) {
+    item.type = "project";
+    item.body = item.body.replace(/^\/project\s*/i, "").trim();
+  } else if (item.body.toLowerCase().startsWith("/task")) {
+    item.type = "task";
+    item.body = item.body.replace(/^\/task\s*/i, "").trim();
+  } else if (item.body.toLowerCase().startsWith("/note")) {
+    item.type = "note";
+    item.body = item.body.replace(/^\/note\s*/i, "").trim();
+  }
+  
+  item.tags = extractTags(item.body);
+  item.dueAt = parseDue(item.body);
   item.updatedAt = nowISO();
 
   // Re-parse day if changed
-  const dayParse = parseDay(action);
+  const dayParse = parseDay(item.body);
   if (dayParse) {
     item.scheduledDay = dayParse.day;
     item.body = dayParse.text;
@@ -355,7 +374,11 @@ async function openEditor(id) {
 
   // Update title
   const first = (item.body.split("\n")[0] || "").trim();
-  if (first && first.length <= 80) item.title = first;
+  if (first.length > 0 && first.length <= 80) {
+    item.title = first;
+  } else if (first.length > 80) {
+    item.title = first.slice(0, 77) + "…";
+  }
 
   await dbPut(item);
   await refresh();
