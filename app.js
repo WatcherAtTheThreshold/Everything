@@ -202,6 +202,88 @@ function formatWeekRange() {
   return `${monStr} – ${sunStr}`;
 }
 
+// ---------- Month utilities ----------
+function getMonthsForYear(year = new Date().getFullYear()) {
+  const months = [];
+  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const now = new Date();
+  const currentMonth = now.getMonth();
+  const currentYear = now.getFullYear();
+
+  for (let i = 0; i < 12; i++) {
+    months.push({
+      index: i,
+      name: monthNames[i],
+      year: year,
+      isCurrent: i === currentMonth && year === currentYear
+    });
+  }
+  return months;
+}
+
+function getWeeksInMonth(year, month) {
+  // Get all weeks that have days in this month
+  const firstDay = new Date(year, month, 1);
+  const lastDay = new Date(year, month + 1, 0);
+
+  const weeks = [];
+  let currentDate = new Date(firstDay);
+
+  // Move to Monday of first week
+  const dayOfWeek = currentDate.getDay();
+  const daysToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+  currentDate.setDate(currentDate.getDate() + daysToMonday);
+
+  let weekIndex = 0;
+  while (currentDate <= lastDay || (currentDate.getMonth() === month && currentDate <= lastDay)) {
+    const weekStart = new Date(currentDate);
+    const weekEnd = new Date(currentDate);
+    weekEnd.setDate(weekEnd.getDate() + 6);
+
+    weeks.push({
+      index: weekIndex,
+      start: weekStart,
+      end: weekEnd,
+      display: `${weekStart.getDate()} – ${weekEnd.getDate()}`
+    });
+
+    currentDate.setDate(currentDate.getDate() + 7);
+    weekIndex++;
+
+    // Stop if we've gone past the month
+    if (currentDate.getMonth() > month || currentDate.getFullYear() > year) break;
+  }
+
+  return weeks;
+}
+
+function getDaysInWeek(weekStart) {
+  const days = [];
+  const dayNames = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+
+  for (let i = 0; i < 7; i++) {
+    const date = new Date(weekStart);
+    date.setDate(weekStart.getDate() + i);
+    days.push({
+      name: dayNames[i],
+      date: date,
+      dateStr: date.toISOString().split('T')[0],
+      display: date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
+    });
+  }
+
+  return days;
+}
+
+function getDateKey(date) {
+  // Returns YYYY-MM-DD format for storing items by specific date
+  const d = new Date(date);
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
 // ---------- IndexedDB ----------
 function openDB() {
   return new Promise((resolve, reject) => {
@@ -268,6 +350,8 @@ let EXPANDED_DAYS = new Set([getTodayDayName()]); // Today expanded by default
 let FILTER_TEXT = "";
 let ACTIVE_TAGS = new Set(); // Active tag filters
 let COLLAPSED_PANELS = new Set(JSON.parse(localStorage.getItem('collapsed_panels') || '[]'));
+let SELECTED_MONTH = null; // null or { year, month } for expanded month
+let SELECTED_WEEK = null; // null or week index within selected month
 
 // ---------- Create / Edit ----------
 function makeId() {
@@ -328,6 +412,7 @@ async function addItem(text) {
     updatedAt: createdAt,
     dueAt,
     scheduledDay, // null for notes, or day name for scheduled
+    scheduledDate: null, // YYYY-MM-DD for specific date scheduling
     done: false,
   };
 
@@ -456,6 +541,7 @@ function render() {
   renderAlerts();
   renderProjects();
   renderRecentLog();
+  renderMonthPanel();
 }
 
 function renderTagChips() {
@@ -675,6 +761,200 @@ function renderItemCard(item, opts = {}) {
 
   el.addEventListener("click", () => openEditor(item.id));
   return el;
+}
+
+function renderMonthPanel() {
+  const container = $("#monthPanel");
+  if (!container) return;
+
+  container.innerHTML = "";
+
+  // If a week is selected, show days in that week
+  if (SELECTED_MONTH && SELECTED_WEEK !== null) {
+    const weeks = getWeeksInMonth(SELECTED_MONTH.year, SELECTED_MONTH.index);
+    const week = weeks[SELECTED_WEEK];
+    if (week) {
+      const days = getDaysInWeek(week.start);
+
+      const backBtn = document.createElement("button");
+      backBtn.className = "month-back-btn";
+      backBtn.textContent = "← Back to weeks";
+      backBtn.addEventListener("click", () => {
+        SELECTED_WEEK = null;
+        render();
+      });
+      container.appendChild(backBtn);
+
+      const weekTitle = document.createElement("div");
+      weekTitle.className = "month-week-title";
+      weekTitle.textContent = `Week of ${week.display}`;
+      container.appendChild(weekTitle);
+
+      const daysGrid = document.createElement("div");
+      daysGrid.className = "month-days-grid";
+
+      for (const day of days) {
+        const dayBox = document.createElement("div");
+        dayBox.className = "month-day-box";
+
+        const items = ALL.filter(i => i.scheduledDate === day.dateStr && !i.done);
+
+        dayBox.innerHTML = `
+          <div class="month-day-name">${day.name.slice(0, 3)}</div>
+          <div class="month-day-date">${day.display}</div>
+          <div class="month-day-count">${items.length}</div>
+        `;
+
+        dayBox.addEventListener("click", () => {
+          const text = prompt(`Add item for ${day.display}:`);
+          if (text && text.trim()) {
+            addItemToDate(text.trim(), day.dateStr);
+          }
+        });
+
+        daysGrid.appendChild(dayBox);
+      }
+
+      container.appendChild(daysGrid);
+    }
+    return;
+  }
+
+  // If a month is selected, show weeks in that month
+  if (SELECTED_MONTH) {
+    const backBtn = document.createElement("button");
+    backBtn.className = "month-back-btn";
+    backBtn.textContent = "← Back to months";
+    backBtn.addEventListener("click", () => {
+      SELECTED_MONTH = null;
+      render();
+    });
+    container.appendChild(backBtn);
+
+    const monthTitle = document.createElement("div");
+    monthTitle.className = "month-title";
+    monthTitle.textContent = `${SELECTED_MONTH.name} ${SELECTED_MONTH.year}`;
+    container.appendChild(monthTitle);
+
+    const weeks = getWeeksInMonth(SELECTED_MONTH.year, SELECTED_MONTH.index);
+    const weeksGrid = document.createElement("div");
+    weeksGrid.className = "month-weeks-grid";
+
+    for (const week of weeks) {
+      const weekBox = document.createElement("div");
+      weekBox.className = "month-week-box";
+
+      // Count items in this week
+      const weekStart = getDateKey(week.start);
+      const weekEnd = getDateKey(week.end);
+      const itemsInWeek = ALL.filter(i => {
+        if (!i.scheduledDate) return false;
+        return i.scheduledDate >= weekStart && i.scheduledDate <= weekEnd && !i.done;
+      }).length;
+
+      weekBox.innerHTML = `
+        <div class="month-week-label">Week ${week.index + 1}</div>
+        <div class="month-week-range">${week.display}</div>
+        <div class="month-week-count">${itemsInWeek}</div>
+      `;
+
+      weekBox.addEventListener("click", () => {
+        SELECTED_WEEK = week.index;
+        render();
+      });
+
+      weeksGrid.appendChild(weekBox);
+    }
+
+    container.appendChild(weeksGrid);
+    return;
+  }
+
+  // Default view: show 12 months
+  const currentYear = new Date().getFullYear();
+  const months = getMonthsForYear(currentYear);
+
+  const monthsGrid = document.createElement("div");
+  monthsGrid.className = "month-grid";
+
+  for (const month of months) {
+    const monthBox = document.createElement("div");
+    monthBox.className = `month-box ${month.isCurrent ? 'month-box--current' : ''}`;
+
+    // Count items in this month
+    const monthStart = `${month.year}-${String(month.index + 1).padStart(2, '0')}-01`;
+    const monthEnd = `${month.year}-${String(month.index + 1).padStart(2, '0')}-31`;
+    const itemsInMonth = ALL.filter(i => {
+      if (!i.scheduledDate) return false;
+      return i.scheduledDate >= monthStart && i.scheduledDate <= monthEnd && !i.done;
+    }).length;
+
+    monthBox.innerHTML = `
+      <div class="month-name">${month.name}</div>
+      <div class="month-count">${itemsInMonth}</div>
+    `;
+
+    monthBox.addEventListener("click", () => {
+      SELECTED_MONTH = month;
+      render();
+    });
+
+    monthsGrid.appendChild(monthBox);
+  }
+
+  container.appendChild(monthsGrid);
+}
+
+async function addItemToDate(text, dateStr) {
+  const raw = text.trim();
+  if (!raw) return;
+
+  const createdAt = nowISO();
+  let type = "task";
+  let title = "";
+  let body = raw;
+
+  // Check for command prefixes
+  if (body.toLowerCase().startsWith("/project")) {
+    type = "project";
+    body = body.replace(/^\/project\s*/i, "").trim();
+  } else if (body.toLowerCase().startsWith("/task")) {
+    type = "task";
+    body = body.replace(/^\/task\s*/i, "").trim();
+  } else if (body.toLowerCase().startsWith("/note")) {
+    type = "note";
+    body = body.replace(/^\/note\s*/i, "").trim();
+  }
+
+  const tags = extractTags(body);
+  const dueAt = parseDue(body);
+
+  const lines = body.split("\n");
+  const first = lines[0].trim();
+  if (first.length > 0 && first.length <= 80) {
+    title = first;
+  } else if (first.length > 80) {
+    title = first.slice(0, 77) + "…";
+  } else {
+    title = "(untitled)";
+  }
+
+  const item = {
+    id: makeId(),
+    type,
+    title,
+    body,
+    tags,
+    createdAt,
+    updatedAt: createdAt,
+    dueAt,
+    scheduledDay: null,
+    scheduledDate: dateStr, // Schedule to specific date
+    done: false,
+  };
+
+  await dbPut(item);
+  await refresh();
 }
 
 // ---------- Backup / Restore ----------
