@@ -31,7 +31,7 @@
 * { box-sizing: border-box; }
 html, body { height: 100%; }
 
-body {
+/*body {
   margin: 0;
   background: url('images/mist-overlay.png') repeat;
   opacity: 0.9;
@@ -45,7 +45,7 @@ body {
   font-family: var(--sans);
 }
 
-/*body {
+body {
  background: url('images/mist-overlay.png') repeat;
       opacity: 0.9;
       position: fixed;
@@ -54,6 +54,13 @@ body {
       z-index: -1;
       animation: mistScroll 120s linear infinite;
   }*/
+
+body {
+  margin: 0;
+  background: linear-gradient(to bottom, #f5f3f0 0%, #f8f6f3 100%);
+  color: var(--text);
+  font-family: var(--sans);
+}
 
 /* ========== TOPBAR ========== */
 .topbar {
