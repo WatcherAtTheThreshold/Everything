@@ -32,6 +32,14 @@
 html, body { height: 100%; }
 
 body {
+  margin: 0;
+  background: url('images/mist-overlay.png') repeat;
+  /*background: linear-gradient(to bottom, #6d919c 0%, #d1d6db 100%);*/
+  color: var(--text);
+  font-family: var(--sans);
+}
+
+/*body {
  background: url('images/mist-overlay.png') repeat;
       opacity: 0.9;
       position: fixed;
@@ -39,7 +47,7 @@ body {
       height: 100%;
       z-index: -1;
       animation: mistScroll 120s linear infinite;
-  }
+  }*/
 
 /* ========== TOPBAR ========== */
 .topbar {
