@@ -76,6 +76,10 @@ function escapeHtml(s) {
     .replaceAll("'","&#039;");
 }
 
+function escapeMd(s) {
+  return (s || "").replace(/([#_*~`])/g, "\\$1");
+}
+
 // ---------- Filter utilities ----------
 function getAllTags() {
   const tagSet = new Set();
@@ -263,6 +267,7 @@ let ALL = [];
 let EXPANDED_DAYS = new Set([getTodayDayName()]); // Today expanded by default
 let FILTER_TEXT = "";
 let ACTIVE_TAGS = new Set(); // Active tag filters
+let COLLAPSED_PANELS = new Set(JSON.parse(localStorage.getItem('collapsed_panels') || '[]'));
 
 // ---------- Create / Edit ----------
 function makeId() {
@@ -673,8 +678,9 @@ function renderItemCard(item, opts = {}) {
 }
 
 // ---------- Backup / Restore ----------
-function downloadJSON(obj, filename = "everything-console-backup.json") {
-  const blob = new Blob([JSON.stringify(obj, null, 2)], { type: "application/json" });
+function downloadJSON(obj, filename = "everything-console-backup.json", mimeType = "application/json") {
+  const content = typeof obj === "string" ? obj : JSON.stringify(obj, null, 2);
+  const blob = new Blob([content], { type: mimeType });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
@@ -693,6 +699,67 @@ async function exportAll() {
     items: ALL,
   };
   downloadJSON(payload);
+}
+
+async function exportMarkdown() {
+  await refresh(); // ensure ALL is current
+  let md = `# Everything Console Export – ${new Date().toLocaleDateString()}\n\n`;
+
+  // Metadata
+  md += "## Metadata\n";
+  md += `Exported: ${new Date().toISOString()}\n`;
+  md += `Items total: ${ALL.length}\n\n`;
+
+  // Projects first
+  md += "## Projects\n";
+  const projects = ALL.filter(i => i.type === "project").sort((a,b) => b.updatedAt.localeCompare(a.updatedAt));
+  if (projects.length === 0) {
+    md += "*No projects yet*\n\n";
+  } else {
+    for (const p of projects) {
+      md += `### ${escapeMd(p.title)} ${p.tags?.join(" ") || ""}\n`;
+      md += `Last updated: ${fmt(p.updatedAt)}\n`;
+      md += `${escapeMd(p.body)}\n\n`;
+    }
+  }
+
+  // Then week view
+  md += "## This Week\n";
+  const weekDays = getWeekDays();
+  for (const day of weekDays) {
+    const items = ALL.filter(i => i.scheduledDay === day.name && !i.done);
+    if (items.length) {
+      md += `### ${day.name.charAt(0).toUpperCase() + day.name.slice(1)} (${day.display})\n`;
+      for (const i of items) md += `- [ ] ${escapeMd(i.title || i.body.slice(0,60))}\n`;
+      md += "\n";
+    }
+  }
+
+  // Notes
+  md += "## All Notes (reverse chrono)\n";
+  const notes = ALL.filter(i => i.type === "note").sort((a,b) => b.createdAt.localeCompare(a.createdAt));
+  if (notes.length === 0) {
+    md += "*No notes yet*\n\n";
+  } else {
+    for (const n of notes) {
+      const date = new Date(n.createdAt).toLocaleDateString();
+      md += `- ${date}: ${escapeMd(n.title)} ${n.tags?.join(" ") || ""}\n`;
+    }
+    md += "\n";
+  }
+
+  // Archived / Done Items
+  md += "## Archived / Done Items\n";
+  const done = ALL.filter(i => i.done).sort((a,b) => b.updatedAt.localeCompare(a.updatedAt));
+  if (done.length === 0) {
+    md += "*No completed items yet*\n\n";
+  } else {
+    for (const d of done) {
+      md += `- [x] ${escapeMd(d.title || d.body.slice(0,60))} (${d.type})\n`;
+    }
+  }
+
+  downloadJSON(md, "everything-export.md", "text/markdown");
 }
 
 async function importAll(file) {
@@ -803,7 +870,29 @@ function wireUI() {
   // Clear filter button
   $("#clearFilter").addEventListener("click", clearFilter);
 
+  // Panel collapse toggles
+  document.querySelectorAll('.panel__toggle').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation(); // Don't trigger other clicks
+      const panelId = btn.dataset.panel;
+      const panel = document.querySelector(`[data-panel-id="${panelId}"]`);
+      if (panel) {
+        panel.classList.toggle('panel--collapsed');
+
+        // Save state
+        if (panel.classList.contains('panel--collapsed')) {
+          COLLAPSED_PANELS.add(panelId);
+        } else {
+          COLLAPSED_PANELS.delete(panelId);
+        }
+        localStorage.setItem('collapsed_panels', JSON.stringify([...COLLAPSED_PANELS]));
+      }
+    });
+  });
+
   $("#btnExport").addEventListener("click", exportAll);
+
+  $("#btnExportMd").addEventListener("click", exportMarkdown);
 
   $("#importFile").addEventListener("change", async (e) => {
     const file = e.target.files?.[0];
@@ -827,6 +916,12 @@ async function boot() {
   await refresh();
   tickClock();
   setInterval(tickClock, 1000);
+
+  // Restore collapsed state
+  for (const panelId of COLLAPSED_PANELS) {
+    const panel = document.querySelector(`[data-panel-id="${panelId}"]`);
+    if (panel) panel.classList.add('panel--collapsed');
+  }
 
   // Focus capture
   setTimeout(() => $("#captureInput").focus(), 120);
