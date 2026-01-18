@@ -136,6 +136,7 @@ body {
   border-radius: var(--radius);
   box-shadow: var(--shadow-md); /* CHANGED */
   overflow: hidden;
+  opacity: 0.85;
 }
 
 .panel--compact {
