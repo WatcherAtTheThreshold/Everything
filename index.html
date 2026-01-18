@@ -61,21 +61,31 @@ Day prefix: <code>monday:</code> <code>tue:</code> etc. • Tags: <code>#like-th
       </section>
 
       <!-- THIS WEEK -->
-      <section class="panel">
+      <section class="panel" data-panel-id="week">
         <div class="panel__head">
           <div class="panel__title">THIS WEEK</div>
-          <div class="panel__meta" id="weekRange">Jan 13-19, 2026</div>
+          <div class="panel__meta">
+            <button class="panel__toggle" data-panel="week" title="Collapse">▼</button>
+            <span id="weekRange">Jan 13-19, 2026</span>
+          </div>
         </div>
-        <div id="weekView" class="week-view"></div>
+        <div class="panel__body">
+          <div id="weekView" class="week-view"></div>
+        </div>
       </section>
 
       <!-- NOTES (atemporal) -->
-      <section class="panel">
+      <section class="panel" data-panel-id="notes">
         <div class="panel__head">
           <div class="panel__title">NOTES</div>
-          <div class="panel__meta">ideas & references</div>
+          <div class="panel__meta">
+            <button class="panel__toggle" data-panel="notes" title="Collapse">▼</button>
+            <span>ideas & references</span>
+          </div>
         </div>
-        <div id="notesList" class="list"></div>
+        <div class="panel__body">
+          <div id="notesList" class="list"></div>
+        </div>
       </section>
 
     </div>
@@ -84,46 +94,67 @@ Day prefix: <code>monday:</code> <code>tue:</code> etc. • Tags: <code>#like-th
     <div class="pane pane--right">
       
       <!-- ALERTS -->
-      <section class="panel panel--compact">
+      <section class="panel panel--compact" data-panel-id="alerts">
         <div class="panel__head">
           <div class="panel__title">ALERTS</div>
-          <div class="panel__meta">computed</div>
+          <div class="panel__meta">
+            <button class="panel__toggle" data-panel="alerts" title="Collapse">▼</button>
+            <span>computed</span>
+          </div>
         </div>
-        <div id="alerts" class="list list--compact"></div>
+        <div class="panel__body">
+          <div id="alerts" class="list list--compact"></div>
+        </div>
       </section>
 
       <!-- PROJECTS -->
-      <section class="panel panel--compact">
+      <section class="panel panel--compact" data-panel-id="projects">
         <div class="panel__head">
           <div class="panel__title">PROJECTS</div>
-          <div class="panel__meta">active</div>
+          <div class="panel__meta">
+            <button class="panel__toggle" data-panel="projects" title="Collapse">▼</button>
+            <span>active</span>
+          </div>
         </div>
-        <div id="projects" class="list list--compact"></div>
+        <div class="panel__body">
+          <div id="projects" class="list list--compact"></div>
+        </div>
       </section>
 
       <!-- RECENT LOG -->
-      <section class="panel panel--compact">
+      <section class="panel panel--compact" data-panel-id="recent">
         <div class="panel__head">
           <div class="panel__title">RECENT LOG</div>
-          <div class="panel__meta">chronological</div>
+          <div class="panel__meta">
+            <button class="panel__toggle" data-panel="recent" title="Collapse">▼</button>
+            <span>chronological</span>
+          </div>
         </div>
-        <div id="recentLog" class="list list--compact"></div>
+        <div class="panel__body">
+          <div id="recentLog" class="list list--compact"></div>
+        </div>
       </section>
 
       <!-- TOOLS -->
-      <section class="panel panel--compact">
+      <section class="panel panel--compact" data-panel-id="tools">
         <div class="panel__head">
           <div class="panel__title">TOOLS</div>
-          <div class="panel__meta">backup / restore</div>
+          <div class="panel__meta">
+            <button class="panel__toggle" data-panel="tools" title="Collapse">▼</button>
+            <span>backup / restore</span>
+          </div>
         </div>
-        <div class="tools">
-          <button id="btnExport" class="btn btn--sm">Export</button>
-          <label class="btn btn--sm btn--ghost">
-            Import
-            <input id="importFile" type="file" accept="application/json" hidden />
-          </label>
-          <button id="btnSeed" class="btn btn--sm btn--ghost">Seed</button>
-          <button id="btnWipe" class="btn btn--sm btn--danger">Wipe</button>
+        <div class="panel__body">
+          <div class="tools">
+            <button id="btnExport" class="btn btn--sm">Export</button>
+            <button id="btnExportMd" class="btn btn--sm">Export .md</button>
+            <label class="btn btn--sm btn--ghost">
+              Import
+              <input id="importFile" type="file" accept="application/json" hidden />
+            </label>
+            <button id="btnSeed" class="btn btn--sm btn--ghost">Seed</button>
+            <button id="btnWipe" class="btn btn--sm btn--danger">Wipe</button>
+          </div>
         </div>
       </section>
 
