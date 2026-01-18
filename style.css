@@ -47,6 +47,10 @@ body {
       z-index: -1;
       animation: mistScroll 120s linear infinite;
     }
+    @keyframes mistScroll {
+      from { background-position: 0 0; }
+      to { background-position: -500px 500px; }
+    }
 
 /* ========== TOPBAR ========== */
 .topbar {
