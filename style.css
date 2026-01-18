@@ -33,7 +33,7 @@ html, body { height: 100%; }
 
 body {
   margin: 0;
-  background: linear-gradient(to bottom,  #28476b 100%, #6d919c 0%);
+  background: linear-gradient(to bottom, #28476b 100%, #6d919c 0%, #28476b 100%);
   color: var(--text);
   font-family: var(--sans);
 }
