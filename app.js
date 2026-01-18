@@ -284,6 +284,33 @@ function getDateKey(date) {
   return `${year}-${month}-${day}`;
 }
 
+function getDayNameFromDate(dateStr) {
+  // Convert YYYY-MM-DD to day name if it falls in current week
+  const { monday, sunday } = getWeekBounds();
+  const date = new Date(dateStr);
+
+  if (date >= monday && date <= sunday) {
+    return getDayOfWeek(date);
+  }
+  return null;
+}
+
+function getDateFromDayName(dayName) {
+  // Convert day name to YYYY-MM-DD for current week
+  const weekDays = getWeekDays();
+  const day = weekDays.find(d => d.name === dayName);
+  return day ? day.dateStr : null;
+}
+
+function getItemsForDay(dayName, dateStr) {
+  // Get all items for a specific day, checking both scheduledDay and scheduledDate
+  return ALL.filter(item => {
+    if (item.done) return false;
+    // Match by day name OR by specific date
+    return item.scheduledDay === dayName || item.scheduledDate === dateStr;
+  });
+}
+
 // ---------- IndexedDB ----------
 function openDB() {
   return new Promise((resolve, reject) => {
@@ -367,13 +394,16 @@ async function addItem(text) {
   let title = "";
   let body = raw;
   let scheduledDay = null; // for week scheduling
-  
+  let scheduledDate = null; // for specific date scheduling
+
   // Check for day prefix
   const dayParse = parseDay(raw);
   if (dayParse) {
     scheduledDay = dayParse.day;
     body = dayParse.text;
     type = "task"; // scheduled items are tasks
+    // Also set scheduledDate if this day is in current week
+    scheduledDate = getDateFromDayName(dayParse.day);
   }
 
   // Check for command prefixes
@@ -412,7 +442,7 @@ async function addItem(text) {
     updatedAt: createdAt,
     dueAt,
     scheduledDay, // null for notes, or day name for scheduled
-    scheduledDate: null, // YYYY-MM-DD for specific date scheduling
+    scheduledDate, // YYYY-MM-DD for specific date scheduling
     done: false,
   };
 
@@ -586,11 +616,10 @@ function renderWeekView() {
   const hasFilter = FILTER_TEXT !== "" || ACTIVE_TAGS.size > 0;
 
   for (const day of weekDays) {
-    // Get ALL items for this day (don't filter yet)
-    const allDayItems = ALL.filter(it => 
-      it.scheduledDay === day.name && !it.done
-    ).sort((a,b) => (a.createdAt||"").localeCompare(b.createdAt||""));
-    
+    // Get ALL items for this day - both scheduledDay and scheduledDate (don't filter yet)
+    const allDayItems = getItemsForDay(day.name, day.dateStr)
+      .sort((a,b) => (a.createdAt||"").localeCompare(b.createdAt||""));
+
     // Then filter for display
     const dayItems = allDayItems.filter(matchesFilter);
 
@@ -797,7 +826,8 @@ function renderMonthPanel() {
         const dayBox = document.createElement("div");
         dayBox.className = "month-day-box";
 
-        const items = ALL.filter(i => i.scheduledDate === day.dateStr && !i.done);
+        // Use getItemsForDay to include both scheduledDate and scheduledDay items
+        const items = getItemsForDay(day.name, day.dateStr);
 
         dayBox.innerHTML = `
           <div class="month-day-name">${day.name.slice(0, 3)}</div>
@@ -939,6 +969,9 @@ async function addItemToDate(text, dateStr) {
     title = "(untitled)";
   }
 
+  // If this date falls in current week, also set scheduledDay
+  const scheduledDay = getDayNameFromDate(dateStr);
+
   const item = {
     id: makeId(),
     type,
@@ -948,7 +981,7 @@ async function addItemToDate(text, dateStr) {
     createdAt,
     updatedAt: createdAt,
     dueAt,
-    scheduledDay: null,
+    scheduledDay, // Set if date is in current week
     scheduledDate: dateStr, // Schedule to specific date
     done: false,
   };
