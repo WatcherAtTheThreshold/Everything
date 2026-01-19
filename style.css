@@ -145,13 +145,25 @@ body {
   background: var(--panel);
   border: 1px solid var(--line);
   border-radius: var(--radius);
-  box-shadow: var(--shadow-md); /* CHANGED */
+  box-shadow: var(--shadow-md);
   overflow: hidden;
   opacity: 0.85;
+  transition: opacity 0.3s ease, box-shadow 0.3s ease, filter 0.3s ease;
+}
+
+.panel:hover {
+  opacity: 1;
+  box-shadow: var(--shadow-hover);
+  filter: drop-shadow(0 0 8px rgba(74, 111, 165, 0.15));
 }
 
 .panel--compact {
-  /* Smaller panels for right sidebar */
+  /* Smaller panels for right sidebar - subtle scanline texture */
+  background-image: linear-gradient(
+    rgba(107, 101, 96, 0.018) 1px,
+    transparent 1px
+  );
+  background-size: 100% 3px;
 }
 
 .panel__head {
@@ -170,6 +182,7 @@ body {
   font-weight: 600;
   color: var(--hot);
   text-transform: uppercase;
+  text-shadow: 0 0 6px rgba(74, 111, 165, 0.25);
 }
 
 .panel__meta {
@@ -212,6 +225,42 @@ body {
 .panel--collapsed .panel__body {
   max-height: 0;
   opacity: 0;
+}
+
+/* ========== PANEL COLOR ACCENTS ========== */
+/* Input/interactive panels - blue accent */
+.panel--filter {
+  border-left: 3px solid var(--hot);
+}
+
+/* Week view - today blue accent */
+[data-panel-id="week"] {
+  border-left: 3px solid var(--today);
+}
+
+/* Alerts - warm/attention accent */
+[data-panel-id="alerts"] {
+  border-left: 3px solid var(--warn);
+}
+
+/* Projects - blue accent for active work */
+[data-panel-id="projects"] {
+  border-left: 3px solid var(--hot);
+}
+
+/* Archive - green for completed/stable */
+[data-panel-id="archive"] {
+  border-left: 3px solid var(--ok);
+}
+
+/* Notes - subtle muted accent */
+[data-panel-id="notes"] {
+  border-left: 3px solid var(--line);
+}
+
+/* Calendar - today accent */
+[data-panel-id="month"] {
+  border-left: 3px solid var(--today);
 }
 
 /* ========== CAPTURE ========== */
