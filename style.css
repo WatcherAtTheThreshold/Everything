@@ -533,6 +533,28 @@ body {
   box-shadow: var(--shadow-hover); /* CHANGED */
 }
 
+/* Done/completed items */
+.item--done {
+  opacity: 0.6;
+  background: rgba(107, 101, 96, 0.02);
+}
+
+.item--done:hover {
+  opacity: 0.8;
+}
+
+.item--done .item__title {
+  text-decoration: line-through;
+  color: var(--muted);
+}
+
+.done-check {
+  display: inline-block;
+  margin-right: 6px;
+  color: var(--ok);
+  font-weight: 600;
+}
+
 .item__top {
   display: flex;
   justify-content: space-between;
