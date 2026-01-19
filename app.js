@@ -321,6 +321,21 @@ function getItemsForDay(dayName, dateStr, includeDone = false) {
   });
 }
 
+function getRelatedItems(project) {
+  // Get all items (notes/tasks) that share tags with this project
+  if (!project.tags || project.tags.length === 0) return [];
+
+  return ALL.filter(item => {
+    // Don't include the project itself
+    if (item.id === project.id) return false;
+    // Only include notes and tasks (not other projects)
+    if (item.type === 'project') return false;
+    // Check if item has any matching tags
+    if (!item.tags || item.tags.length === 0) return false;
+    return item.tags.some(tag => project.tags.includes(tag));
+  }).sort((a, b) => (b.updatedAt || "").localeCompare(a.updatedAt || ""));
+}
+
 function getDateUrgency(dateStr) {
   // Calculate urgency level based on how far away the date is
   if (!dateStr) return null;
@@ -448,6 +463,7 @@ let ACTIVE_TAGS = new Set(); // Active tag filters
 let COLLAPSED_PANELS = new Set(JSON.parse(localStorage.getItem('collapsed_panels') || '[]'));
 let SELECTED_MONTH = null; // null or { year, month } for expanded month
 let SELECTED_WEEK = null; // null or week index within selected month
+let EXPANDED_PROJECTS = new Set(JSON.parse(localStorage.getItem('expanded_projects') || '[]')); // Track expanded project IDs
 
 // ---------- Create / Edit ----------
 function makeId() {
@@ -810,8 +826,8 @@ function renderProjects() {
 
   const container = $("#projects");
   if (projects.length === 0) {
-    const msg = (FILTER_TEXT || ACTIVE_TAGS.size > 0) 
-      ? "No projects match filter." 
+    const msg = (FILTER_TEXT || ACTIVE_TAGS.size > 0)
+      ? "No projects match filter."
       : "No projects. Use /project to create one.";
     container.innerHTML = `<div class="empty">${msg}</div>`;
     return;
@@ -819,8 +835,98 @@ function renderProjects() {
 
   container.innerHTML = "";
   for (const proj of projects.slice(0, 10)) {
-    container.appendChild(renderItemCard(proj, { compact: true }));
+    container.appendChild(renderProjectCard(proj));
   }
+}
+
+function renderProjectCard(project) {
+  const isExpanded = EXPANDED_PROJECTS.has(project.id);
+  const relatedItems = getRelatedItems(project);
+
+  const wrapper = document.createElement("div");
+  wrapper.className = "project-wrapper";
+
+  // Project header card
+  const projectCard = document.createElement("div");
+  projectCard.className = `item item--project ${isExpanded ? 'item--expanded' : ''}`;
+
+  const tags = project.tags || [];
+  const title = project.title || "(untitled)";
+
+  projectCard.innerHTML = `
+    <div class="item__top">
+      <div class="item__title">
+        <span class="project-toggle">${isExpanded ? '▼' : '▶'}</span>
+        ${escapeHtml(title)}
+        ${tags.length ? `<span class="project-tag-count">${tags.length} tag${tags.length > 1 ? 's' : ''}</span>` : ''}
+      </div>
+      <div class="item__meta">PROJECT</div>
+    </div>
+    ${isExpanded && project.body ? `<div class="item__body">${escapeHtml(shortBody(project.body))}</div>` : ''}
+    ${tags.length ? `<div class="tags">${tags.map(t => `<span class="tag">${escapeHtml(t)}</span>`).join("")}</div>` : ``}
+  `;
+
+  // Click on project header to toggle expand/collapse
+  projectCard.addEventListener("click", (e) => {
+    // Don't toggle if clicking on a tag
+    if (e.target.closest('.tag')) return;
+
+    toggleProject(project.id);
+  });
+
+  // Right-click to edit
+  projectCard.addEventListener("contextmenu", (e) => {
+    e.preventDefault();
+    openEditor(project.id);
+  });
+
+  wrapper.appendChild(projectCard);
+
+  // Related items (shown when expanded)
+  if (isExpanded && relatedItems.length > 0) {
+    const relatedContainer = document.createElement("div");
+    relatedContainer.className = "project-related";
+
+    const relatedHeader = document.createElement("div");
+    relatedHeader.className = "project-related-header";
+    relatedHeader.textContent = `Related Items (${relatedItems.length})`;
+    relatedContainer.appendChild(relatedHeader);
+
+    for (const item of relatedItems.slice(0, 10)) {
+      const relatedCard = renderItemCard(item, { compact: true, showDate: true });
+      relatedCard.classList.add('project-related-item');
+      relatedContainer.appendChild(relatedCard);
+    }
+
+    if (relatedItems.length > 10) {
+      const moreMsg = document.createElement("div");
+      moreMsg.className = "project-related-more";
+      moreMsg.textContent = `+${relatedItems.length - 10} more items`;
+      relatedContainer.appendChild(moreMsg);
+    }
+
+    wrapper.appendChild(relatedContainer);
+  } else if (isExpanded && relatedItems.length === 0) {
+    const emptyMsg = document.createElement("div");
+    emptyMsg.className = "project-related-empty";
+    emptyMsg.textContent = "No related items yet. Add notes/tasks with matching tags.";
+    wrapper.appendChild(emptyMsg);
+  }
+
+  return wrapper;
+}
+
+function toggleProject(projectId) {
+  if (EXPANDED_PROJECTS.has(projectId)) {
+    EXPANDED_PROJECTS.delete(projectId);
+  } else {
+    EXPANDED_PROJECTS.add(projectId);
+  }
+
+  // Save to localStorage
+  localStorage.setItem('expanded_projects', JSON.stringify([...EXPANDED_PROJECTS]));
+
+  renderProjects();
 }
 
 function renderRecentLog() {
