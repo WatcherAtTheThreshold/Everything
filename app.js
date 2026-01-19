@@ -302,10 +302,11 @@ function getDateFromDayName(dayName) {
   return day ? day.dateStr : null;
 }
 
-function getItemsForDay(dayName, dateStr) {
+function getItemsForDay(dayName, dateStr, includeDone = false) {
   // Get all items for a specific day, checking both scheduledDay and scheduledDate
   return ALL.filter(item => {
-    if (item.done) return false;
+    // Optionally filter out done items
+    if (!includeDone && item.done) return false;
     // Match by day name OR by specific date
     return item.scheduledDay === dayName || item.scheduledDate === dateStr;
   });
@@ -628,6 +629,7 @@ function render() {
   renderProjects();
   renderRecentLog();
   renderMonthPanel();
+  renderArchive();
 }
 
 function renderTagChips() {
@@ -672,9 +674,13 @@ function renderWeekView() {
   const hasFilter = FILTER_TEXT !== "" || ACTIVE_TAGS.size > 0;
 
   for (const day of weekDays) {
-    // Get ALL items for this day - both scheduledDay and scheduledDate (don't filter yet)
-    const allDayItems = getItemsForDay(day.name, day.dateStr)
-      .sort((a,b) => (a.createdAt||"").localeCompare(b.createdAt||""));
+    // Get ALL items for this day - both scheduledDay and scheduledDate, including done items
+    const allDayItems = getItemsForDay(day.name, day.dateStr, true)
+      .sort((a,b) => {
+        // Sort done items to the bottom
+        if (a.done !== b.done) return a.done ? 1 : -1;
+        return (a.createdAt||"").localeCompare(b.createdAt||"");
+      });
 
     // Then filter for display
     const dayItems = allDayItems.filter(matchesFilter);
@@ -710,7 +716,7 @@ function renderWeekView() {
       itemsContainer.innerHTML = '<div class="day__empty">No matches for current filter</div>';
     } else {
       for (const item of dayItems) {
-        const card = renderItemCard(item, { compact: true });
+        const card = renderItemCard(item, { compact: true, isDone: item.done });
         if (hasFilter) {
           card.classList.add('item--match');
         }
@@ -801,8 +807,8 @@ function renderRecentLog() {
 
   const container = $("#recentLog");
   if (recent.length === 0) {
-    const msg = (FILTER_TEXT || ACTIVE_TAGS.size > 0) 
-      ? "No entries match filter." 
+    const msg = (FILTER_TEXT || ACTIVE_TAGS.size > 0)
+      ? "No entries match filter."
       : "No entries yet.";
     container.innerHTML = `<div class="empty">${msg}</div>`;
     return;
@@ -810,16 +816,40 @@ function renderRecentLog() {
 
   container.innerHTML = "";
   for (const item of recent.slice(0, 8)) {
-    container.appendChild(renderItemCard(item, { 
+    container.appendChild(renderItemCard(item, {
       compact: true,
-      showDate: true 
+      showDate: true
+    }));
+  }
+}
+
+function renderArchive() {
+  // Completed/done items sorted by completion date (most recent first)
+  const archived = ALL.filter(it => it.done && matchesFilter(it))
+    .sort((a,b) => (b.updatedAt||"").localeCompare(a.updatedAt||""));
+
+  const container = $("#archiveList");
+  if (archived.length === 0) {
+    const msg = (FILTER_TEXT || ACTIVE_TAGS.size > 0)
+      ? "No archived items match filter."
+      : "No completed items yet.";
+    container.innerHTML = `<div class="empty">${msg}</div>`;
+    return;
+  }
+
+  container.innerHTML = "";
+  for (const item of archived.slice(0, 20)) {
+    container.appendChild(renderItemCard(item, {
+      compact: true,
+      showDate: true,
+      isDone: true
     }));
   }
 }
 
 function renderItemCard(item, opts = {}) {
   const el = document.createElement("div");
-  el.className = "item";
+  el.className = `item ${opts.isDone ? 'item--done' : ''}`;
 
   let metaRight = "";
   let urgencyPill = "";
@@ -845,6 +875,7 @@ function renderItemCard(item, opts = {}) {
   el.innerHTML = `
     <div class="item__top">
       <div class="item__title">
+        ${opts.isDone ? '<span class="done-check">✓</span>' : ''}
         ${escapeHtml(title)}
         ${urgencyPill}
       </div>
@@ -892,13 +923,15 @@ function renderMonthPanel() {
         const dayBox = document.createElement("div");
         dayBox.className = "month-day-box";
 
-        // Use getItemsForDay to include both scheduledDate and scheduledDay items
-        const items = getItemsForDay(day.name, day.dateStr);
+        // Use getItemsForDay to include both scheduledDate and scheduledDay items, including done
+        const items = getItemsForDay(day.name, day.dateStr, true);
+        const doneCount = items.filter(i => i.done).length;
+        const activeCount = items.filter(i => !i.done).length;
 
         dayBox.innerHTML = `
           <div class="month-day-name">${day.name.slice(0, 3)}</div>
           <div class="month-day-date">${day.display}</div>
-          <div class="month-day-count">${items.length}</div>
+          <div class="month-day-count">${activeCount}${doneCount > 0 ? ` / ${doneCount}✓` : ''}</div>
         `;
 
         dayBox.addEventListener("click", () => {
@@ -943,15 +976,17 @@ function renderMonthPanel() {
       // Count items in this week
       const weekStart = getDateKey(week.start);
       const weekEnd = getDateKey(week.end);
-      const itemsInWeek = ALL.filter(i => {
+      const allItemsInWeek = ALL.filter(i => {
         if (!i.scheduledDate) return false;
-        return i.scheduledDate >= weekStart && i.scheduledDate <= weekEnd && !i.done;
-      }).length;
+        return i.scheduledDate >= weekStart && i.scheduledDate <= weekEnd;
+      });
+      const activeCount = allItemsInWeek.filter(i => !i.done).length;
+      const doneCount = allItemsInWeek.filter(i => i.done).length;
 
       weekBox.innerHTML = `
         <div class="month-week-label">Week ${week.index + 1}</div>
         <div class="month-week-range">${week.display}</div>
-        <div class="month-week-count">${itemsInWeek}</div>
+        <div class="month-week-count">${activeCount}${doneCount > 0 ? ` / ${doneCount}✓` : ''}</div>
       `;
 
       weekBox.addEventListener("click", () => {
@@ -980,14 +1015,16 @@ function renderMonthPanel() {
     // Count items in this month
     const monthStart = `${month.year}-${String(month.index + 1).padStart(2, '0')}-01`;
     const monthEnd = `${month.year}-${String(month.index + 1).padStart(2, '0')}-31`;
-    const itemsInMonth = ALL.filter(i => {
+    const allItemsInMonth = ALL.filter(i => {
       if (!i.scheduledDate) return false;
-      return i.scheduledDate >= monthStart && i.scheduledDate <= monthEnd && !i.done;
-    }).length;
+      return i.scheduledDate >= monthStart && i.scheduledDate <= monthEnd;
+    });
+    const activeCount = allItemsInMonth.filter(i => !i.done).length;
+    const doneCount = allItemsInMonth.filter(i => i.done).length;
 
     monthBox.innerHTML = `
       <div class="month-name">${month.name}</div>
-      <div class="month-count">${itemsInMonth}</div>
+      <div class="month-count">${activeCount}${doneCount > 0 ? ` / ${doneCount}✓` : ''}</div>
     `;
 
     monthBox.addEventListener("click", () => {
