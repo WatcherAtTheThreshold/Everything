@@ -121,12 +121,23 @@ body {
 }
 
 .pane--left {
-  /* Left pane is naturally taller */
+  /* Left pane: solid, grounded workspace */
+}
+
+.pane--left .panel {
+  opacity: 0.95;
+  background: linear-gradient(to bottom, var(--panel) 0%, rgba(250, 248, 245, 0.92) 100%);
 }
 
 .pane--right {
   position: sticky;
   top: 92px; /* Below topbar */
+}
+
+.pane--right .panel {
+  opacity: 0.78;
+  background: rgba(250, 248, 245, 0.72);
+  backdrop-filter: blur(2px);
 }
 
 /* ========== PANELS ========== */
