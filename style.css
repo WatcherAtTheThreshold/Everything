@@ -457,6 +457,50 @@ body {
   font-style: italic;
 }
 
+/* ========== URGENCY PILLS ========== */
+.urgency-pill {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  padding: 3px 7px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  display: inline-block;
+  margin-left: 6px;
+  border: 1px solid;
+}
+
+.urgency-pill--overdue {
+  background: rgba(184, 92, 92, 0.12);
+  border-color: var(--bad);
+  color: var(--bad);
+}
+
+.urgency-pill--today {
+  background: rgba(166, 124, 82, 0.12);
+  border-color: var(--warn);
+  color: var(--warn);
+}
+
+.urgency-pill--week {
+  background: rgba(90, 143, 111, 0.12);
+  border-color: var(--ok);
+  color: var(--ok);
+}
+
+.urgency-pill--month {
+  background: rgba(74, 111, 165, 0.12);
+  border-color: var(--hot);
+  color: var(--hot);
+}
+
+.urgency-pill--future {
+  background: rgba(107, 101, 96, 0.08);
+  border-color: var(--line);
+  color: var(--muted);
+}
+
 /* ========== LISTS ========== */
 .list {
   padding: 8px;
