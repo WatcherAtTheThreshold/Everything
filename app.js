@@ -311,6 +311,50 @@ function getItemsForDay(dayName, dateStr) {
   });
 }
 
+function getDateUrgency(dateStr) {
+  // Calculate urgency level based on how far away the date is
+  if (!dateStr) return null;
+
+  const now = new Date();
+  now.setHours(0, 0, 0, 0); // Start of today
+  const targetDate = new Date(dateStr);
+  targetDate.setHours(0, 0, 0, 0);
+
+  const diffMs = targetDate - now;
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+  if (diffDays < 0) {
+    return { level: 'overdue', color: 'bad', label: 'OVERDUE', days: Math.abs(diffDays) };
+  } else if (diffDays === 0) {
+    return { level: 'today', color: 'warn', label: 'TODAY', days: 0 };
+  } else if (diffDays <= 7) {
+    return { level: 'week', color: 'ok', label: `${diffDays}d`, days: diffDays };
+  } else if (diffDays <= 30) {
+    return { level: 'month', color: 'hot', label: `${diffDays}d`, days: diffDays };
+  } else {
+    return { level: 'future', color: 'muted', label: `${diffDays}d`, days: diffDays };
+  }
+}
+
+function getDatedItems() {
+  // Get all items with due dates or scheduled dates
+  return ALL.filter(item => {
+    if (item.done) return false;
+    return item.dueAt || item.scheduledDate;
+  }).map(item => {
+    // Determine the effective date (prefer dueAt, fallback to scheduledDate)
+    const effectiveDate = item.dueAt || item.scheduledDate;
+    const urgency = getDateUrgency(effectiveDate);
+    return { ...item, effectiveDate, urgency };
+  }).filter(item => item.urgency !== null)
+    .sort((a, b) => {
+      // Sort by urgency: overdue first, then by days remaining
+      if (a.urgency.level === 'overdue' && b.urgency.level !== 'overdue') return -1;
+      if (b.urgency.level === 'overdue' && a.urgency.level !== 'overdue') return 1;
+      return a.urgency.days - b.urgency.days;
+    });
+}
+
 // ---------- IndexedDB ----------
 function openDB() {
   return new Promise((resolve, reject) => {
@@ -521,29 +565,26 @@ function computeAlerts(items) {
 
   const alerts = [];
 
+  // Add all dated items with urgency indicators
+  const datedItems = getDatedItems();
+  for (const item of datedItems) {
+    alerts.push({
+      ...item,
+      alertLabel: item.urgency.label,
+      urgencyLevel: item.urgency.level,
+      urgencyColor: item.urgency.color,
+      isDatedAlert: true
+    });
+  }
+
+  // Stale projects (that aren't already in dated alerts)
   for (const it of items) {
+    if (it.done) continue;
+
+    // Skip if already added as dated alert
+    if (alerts.some(a => a.id === it.id)) continue;
+
     const updated = new Date(it.updatedAt || it.createdAt || nowISO()).getTime();
-
-    // Due
-    if (it.dueAt && !it.done) {
-      const due = new Date(it.dueAt).getTime();
-      if (!isNaN(due)) {
-        if (due <= now) {
-          alerts.push({
-            ...it,
-            alertLabel: "DUE / OVERDUE",
-            title: it.title || it.body?.slice(0, 40) || "Due item",
-          });
-          continue;
-        }
-        if (due <= now + DAY) {
-          alerts.push({ ...it, alertLabel: "DUE SOON" });
-          continue;
-        }
-      }
-    }
-
-    // Stale projects
     const isProjectish = it.type === "project" || (it.tags || []).includes("#project");
     if (isProjectish) {
       const ageDays = Math.floor((now - updated) / DAY);
@@ -552,13 +593,28 @@ function computeAlerts(items) {
           ...it,
           alertLabel: `STALE • ${ageDays}d`,
           title: it.title || "Stale project",
+          urgencyColor: 'muted'
         });
       }
     }
   }
 
-  const rank = (a) => (a.alertLabel?.includes("OVERDUE") ? 0 : a.alertLabel?.includes("DUE") ? 1 : 2);
-  alerts.sort((a,b) => rank(a) - rank(b));
+  // Sort by urgency: overdue > today > week > month > future > stale
+  const rankUrgency = (a) => {
+    if (a.urgencyLevel === 'overdue') return 0;
+    if (a.urgencyLevel === 'today') return 1;
+    if (a.urgencyLevel === 'week') return 2;
+    if (a.urgencyLevel === 'month') return 3;
+    if (a.urgencyLevel === 'future') return 4;
+    return 5; // stale projects
+  };
+  alerts.sort((a, b) => {
+    const rankDiff = rankUrgency(a) - rankUrgency(b);
+    if (rankDiff !== 0) return rankDiff;
+    // Within same urgency, sort by days
+    if (a.urgency && b.urgency) return a.urgency.days - b.urgency.days;
+    return 0;
+  });
   return alerts;
 }
 
@@ -766,8 +822,15 @@ function renderItemCard(item, opts = {}) {
   el.className = "item";
 
   let metaRight = "";
+  let urgencyPill = "";
+
   if (opts.isAlert) {
     metaRight = item.alertLabel || "ALERT";
+    // Add urgency pill if this is a dated alert
+    if (item.isDatedAlert && item.urgencyLevel) {
+      urgencyPill = `<span class="urgency-pill urgency-pill--${item.urgencyLevel}">${escapeHtml(item.alertLabel)}</span>`;
+      metaRight = ""; // Don't duplicate in meta
+    }
   } else if (opts.showDate) {
     const d = new Date(item.createdAt);
     metaRight = d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
@@ -781,8 +844,11 @@ function renderItemCard(item, opts = {}) {
 
   el.innerHTML = `
     <div class="item__top">
-      <div class="item__title">${escapeHtml(title)}</div>
-      <div class="item__meta">${escapeHtml(metaRight)}</div>
+      <div class="item__title">
+        ${escapeHtml(title)}
+        ${urgencyPill}
+      </div>
+      ${metaRight ? `<div class="item__meta">${escapeHtml(metaRight)}</div>` : ''}
     </div>
     ${body && !opts.compact ? `<div class="item__body">${escapeHtml(shortBody(body))}</div>` : ``}
     ${tags.length && !opts.compact ? `<div class="tags">${tags.map(t => `<span class="tag">${escapeHtml(t)}</span>`).join("")}</div>` : ``}
