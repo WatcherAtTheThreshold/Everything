@@ -81,6 +81,14 @@ function escapeMd(s) {
   return (s || "").replace(/([#_*~`])/g, "\\$1");
 }
 
+// Helper to format dates as YYYY-MM-DD in local time (avoid UTC shift)
+function toLocalDateStr(d) {
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
 // ---------- Filter utilities ----------
 function getAllTags() {
   const tagSet = new Set();
@@ -181,18 +189,18 @@ function getWeekDays() {
   const { monday } = getWeekBounds();
   const days = [];
   const dayNames = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
-  
+
   for (let i = 0; i < 7; i++) {
     const date = new Date(monday);
     date.setDate(monday.getDate() + i);
     days.push({
       name: dayNames[i],
       date: date,
-      dateStr: date.toISOString().split('T')[0],
+      dateStr: toLocalDateStr(date), // FIX: Use local formatter instead of toISOString
       display: date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
     });
   }
-  
+
   return days;
 }
 
@@ -268,7 +276,7 @@ function getDaysInWeek(weekStart) {
     days.push({
       name: dayNames[i],
       date: date,
-      dateStr: date.toISOString().split('T')[0],
+      dateStr: toLocalDateStr(date), // FIX: Use local formatter instead of toISOString
       display: date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
     });
   }
@@ -319,11 +327,26 @@ function getDateUrgency(dateStr) {
 
   const now = new Date();
   now.setHours(0, 0, 0, 0); // Start of today
-  const targetDate = new Date(dateStr);
+
+  let targetDate;
+
+  // DETECT FORMAT:
+  // If it has a "T" (e.g. 2026-01-18T09:00:00.000Z), it's from due: (ISO)
+  // If not (e.g. 2026-01-18), it's from the Calendar/Schedule (YYYY-MM-DD)
+  if (dateStr.includes("T")) {
+    targetDate = new Date(dateStr);
+  } else {
+    // Manually construct local date to avoid UTC shift
+    const [y, m, d] = dateStr.split('-').map(Number);
+    targetDate = new Date(y, m - 1, d);
+  }
+
+  // Normalize to midnight local time
   targetDate.setHours(0, 0, 0, 0);
 
   const diffMs = targetDate - now;
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  // Rounding helps smooth over Daylight Savings shifts
+  const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
 
   if (diffDays < 0) {
     return { level: 'overdue', color: 'bad', label: 'OVERDUE', days: Math.abs(diffDays) };
