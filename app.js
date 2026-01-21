@@ -1665,19 +1665,111 @@ function initPanelDragDrop() {
     panel.addEventListener('drop', handleDrop);
   });
 
-  // Also allow dropping on panes themselves (for empty areas)
+  // Allow dropping on panes themselves (for cross-pane moves and empty areas)
   document.querySelectorAll('.pane').forEach(pane => {
-    pane.addEventListener('dragover', (e) => {
-      e.preventDefault();
-      pane.classList.add('drag-active');
-    });
-    pane.addEventListener('dragleave', () => {
-      pane.classList.remove('drag-active');
-    });
-    pane.addEventListener('drop', () => {
-      pane.classList.remove('drag-active');
-    });
+    pane.addEventListener('dragover', handlePaneDragOver);
+    pane.addEventListener('dragleave', handlePaneDragLeave);
+    pane.addEventListener('drop', handlePaneDrop);
   });
+}
+
+function handlePaneDragOver(e) {
+  e.preventDefault();
+  if (!draggedPanel) return;
+
+  this.classList.add('drag-active');
+
+  // Find the panel we're hovering over within this pane
+  const panels = [...this.querySelectorAll('.panel[data-panel-id]')];
+  const mouseY = e.clientY;
+
+  // Clear previous indicators
+  panels.forEach(p => p.classList.remove('drag-over', 'drag-over-bottom'));
+
+  // Find insertion point
+  for (let i = 0; i < panels.length; i++) {
+    const panel = panels[i];
+    if (panel === draggedPanel) continue;
+
+    const rect = panel.getBoundingClientRect();
+    const midpoint = rect.top + rect.height / 2;
+
+    if (mouseY < midpoint) {
+      panel.classList.add('drag-over');
+      return;
+    } else if (mouseY < rect.bottom) {
+      panel.classList.add('drag-over-bottom');
+      return;
+    }
+  }
+
+  // If we're past all panels, mark the last one as drop-below
+  const lastPanel = panels[panels.length - 1];
+  if (lastPanel && lastPanel !== draggedPanel) {
+    lastPanel.classList.add('drag-over-bottom');
+  }
+}
+
+function handlePaneDragLeave(e) {
+  // Only remove if we're actually leaving the pane
+  if (!this.contains(e.relatedTarget)) {
+    this.classList.remove('drag-active');
+    this.querySelectorAll('.panel').forEach(p => {
+      p.classList.remove('drag-over', 'drag-over-bottom');
+    });
+  }
+}
+
+function handlePaneDrop(e) {
+  e.preventDefault();
+  if (!draggedPanel) return;
+
+  const targetPane = this;
+  targetPane.classList.remove('drag-active');
+
+  // Find where to insert
+  const panels = [...targetPane.querySelectorAll('.panel[data-panel-id]')];
+  let insertBefore = null;
+  let insertAfter = null;
+
+  for (const panel of panels) {
+    if (panel.classList.contains('drag-over')) {
+      insertBefore = panel;
+      break;
+    }
+    if (panel.classList.contains('drag-over-bottom')) {
+      insertAfter = panel;
+      break;
+    }
+  }
+
+  // Clear indicators
+  panels.forEach(p => p.classList.remove('drag-over', 'drag-over-bottom'));
+
+  // Move the panel
+  if (insertBefore) {
+    targetPane.insertBefore(draggedPanel, insertBefore);
+  } else if (insertAfter) {
+    targetPane.insertBefore(draggedPanel, insertAfter.nextSibling);
+  } else {
+    // Append to end of pane
+    targetPane.appendChild(draggedPanel);
+  }
+
+  // Update panel styling based on new pane
+  updatePanelStyleForPane(draggedPanel, targetPane);
+
+  // Save new order
+  savePanelOrder();
+}
+
+function updatePanelStyleForPane(panel, pane) {
+  // Add or remove compact class based on which pane it's in
+  if (pane.classList.contains('pane--right')) {
+    panel.classList.add('panel--compact');
+  } else {
+    panel.classList.remove('panel--compact');
+  }
 }
 
 function handleDragStart(e) {
@@ -1711,11 +1803,6 @@ function handleDragOver(e) {
 
   if (!draggedPanel || draggedPanel === this) return;
 
-  // Only allow dropping within same pane
-  const draggedPane = draggedPanel.closest('.pane');
-  const targetPane = this.closest('.pane');
-  if (draggedPane !== targetPane) return;
-
   // Determine if dropping above or below based on mouse position
   const rect = this.getBoundingClientRect();
   const midpoint = rect.top + rect.height / 2;
@@ -1742,10 +1829,7 @@ function handleDrop(e) {
 
   if (!draggedPanel || draggedPanel === this) return;
 
-  // Only allow dropping within same pane
-  const draggedPane = draggedPanel.closest('.pane');
   const targetPane = this.closest('.pane');
-  if (draggedPane !== targetPane) return;
 
   // Determine position and insert
   const rect = this.getBoundingClientRect();
@@ -1758,6 +1842,9 @@ function handleDrop(e) {
     // Insert after
     this.parentNode.insertBefore(draggedPanel, this.nextSibling);
   }
+
+  // Update panel styling based on new pane
+  updatePanelStyleForPane(draggedPanel, targetPane);
 
   // Clean up classes
   this.classList.remove('drag-over', 'drag-over-bottom');
@@ -1780,19 +1867,28 @@ function restorePanelOrder() {
   const leftOrder = JSON.parse(localStorage.getItem('panel_order_left') || '[]');
   const rightOrder = JSON.parse(localStorage.getItem('panel_order_right') || '[]');
 
+  const leftPane = document.querySelector('.pane--left');
+  const rightPane = document.querySelector('.pane--right');
+
+  // Restore left pane panels (may come from either pane originally)
   if (leftOrder.length > 0) {
-    const leftPane = document.querySelector('.pane--left');
     leftOrder.forEach(id => {
-      const panel = leftPane.querySelector(`[data-panel-id="${id}"]`);
-      if (panel) leftPane.appendChild(panel);
+      const panel = document.querySelector(`[data-panel-id="${id}"]`);
+      if (panel) {
+        leftPane.appendChild(panel);
+        updatePanelStyleForPane(panel, leftPane);
+      }
     });
   }
 
+  // Restore right pane panels (may come from either pane originally)
   if (rightOrder.length > 0) {
-    const rightPane = document.querySelector('.pane--right');
     rightOrder.forEach(id => {
-      const panel = rightPane.querySelector(`[data-panel-id="${id}"]`);
-      if (panel) rightPane.appendChild(panel);
+      const panel = document.querySelector(`[data-panel-id="${id}"]`);
+      if (panel) {
+        rightPane.appendChild(panel);
+        updatePanelStyleForPane(panel, rightPane);
+      }
     });
   }
 }
