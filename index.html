@@ -195,6 +195,30 @@ Day prefix: <code>monday:</code> <code>tue:</code> etc. • Tags: <code>#like-th
     </div>
   </footer>
 
+  <!-- EDIT MODAL -->
+  <div id="editorModal" class="modal-overlay" hidden>
+    <div class="modal-panel">
+      <div class="panel__head">
+        <div class="panel__title">EDIT</div>
+        <div class="panel__meta">
+          <span id="editorType">ITEM</span>
+        </div>
+      </div>
+      <div class="modal-body">
+        <textarea id="editorInput" spellcheck="false" placeholder="Edit content..."></textarea>
+        <div class="modal-hint">
+          Tags: <code>#like-this</code> • Due: <code>due:17-01-2026</code> • Day: <code>monday:</code>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button id="editorSave" class="btn btn--primary">Save</button>
+        <button id="editorDone" class="btn btn--sm">Toggle Done</button>
+        <button id="editorDelete" class="btn btn--sm btn--danger">Delete</button>
+        <button id="editorCancel" class="btn btn--sm btn--ghost">Cancel</button>
+      </div>
+    </div>
+  </div>
+
   <script src="app.js"></script>
 </body>
 </html>
