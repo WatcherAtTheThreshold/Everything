@@ -166,6 +166,40 @@ body {
   background-size: 100% 3px;
 }
 
+/* Drag and drop styles */
+.panel[draggable="true"] {
+  cursor: default;
+}
+
+.panel__drag-handle {
+  cursor: grab;
+}
+
+.panel__drag-handle:active {
+  cursor: grabbing;
+}
+
+.panel.dragging {
+  opacity: 0.5;
+  transform: scale(0.98);
+  box-shadow: var(--shadow-lg);
+}
+
+.panel.drag-over {
+  border-top: 3px solid var(--hot);
+  margin-top: -2px;
+}
+
+.panel.drag-over-bottom {
+  border-bottom: 3px solid var(--hot);
+  margin-bottom: -2px;
+}
+
+.pane.drag-active {
+  background: rgba(74, 111, 165, 0.03);
+  border-radius: var(--radius);
+}
+
 .panel__head {
   display: flex;
   justify-content: space-between;
