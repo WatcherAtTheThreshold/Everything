@@ -634,6 +634,24 @@ body {
   border-radius: 999px;
 }
 
+.project-edit-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--muted);
+  padding: 2px 6px;
+  margin-right: 4px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  line-height: 1;
+}
+
+.project-edit-btn:hover {
+  color: var(--hot);
+  background: rgba(74, 111, 165, 0.1);
+}
+
 .project-related {
   margin-top: 4px;
   margin-left: 16px;
