@@ -1624,11 +1624,11 @@ function wireUI() {
     if (e.target.id === "editorModal") closeEditor();
   });
 
-  // Close modal on Escape, save on Ctrl+Enter
+  // Close modal on Escape, save on Enter (Shift+Enter for newline)
   $("#editorInput").addEventListener("keydown", (e) => {
     if (e.key === "Escape") {
       closeEditor();
-    } else if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+    } else if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       saveEditor();
     }
