@@ -535,67 +535,99 @@ async function addItem(text) {
   await refresh();
 }
 
-async function openEditor(id) {
+let EDITOR_ITEM = null; // Currently editing item
+
+function openEditor(id) {
   const item = ALL.find(i => i.id === id);
   if (!item) return;
 
-  const action = prompt(
-    `EDIT: ${item.type.toUpperCase()}\n\n1) OK = edit body\n2) Type "done" to toggle done\n3) Type "delete" to remove\n\nCurrent body:`,
-    item.body || ""
-  );
+  EDITOR_ITEM = item;
 
-  if (action === null) return;
+  const modal = $("#editorModal");
+  const input = $("#editorInput");
+  const typeLabel = $("#editorType");
 
-  const cmd = action.trim().toLowerCase();
-  if (cmd === "delete") {
-    await dbDelete(item.id);
-    await refresh();
-    return;
-  }
-  if (cmd === "done") {
-    item.done = !item.done;
-    item.updatedAt = nowISO();
-    await dbPut(item);
-    await refresh();
-    return;
-  }
+  // Set type label
+  typeLabel.textContent = item.type.toUpperCase();
 
-  // Update body/tags/due
-  item.body = action;
-  
+  // Set input value and show modal
+  input.value = item.body || "";
+  modal.hidden = false;
+
+  // Focus and select text
+  input.focus();
+  input.select();
+}
+
+function closeEditor() {
+  const modal = $("#editorModal");
+  modal.hidden = true;
+  EDITOR_ITEM = null;
+}
+
+async function saveEditor() {
+  if (!EDITOR_ITEM) return;
+
+  const input = $("#editorInput");
+  let newBody = input.value;
+
   // Re-parse command prefixes if present
-  if (item.body.toLowerCase().startsWith("/project")) {
-    item.type = "project";
-    item.body = item.body.replace(/^\/project\s*/i, "").trim();
-  } else if (item.body.toLowerCase().startsWith("/task")) {
-    item.type = "task";
-    item.body = item.body.replace(/^\/task\s*/i, "").trim();
-  } else if (item.body.toLowerCase().startsWith("/note")) {
-    item.type = "note";
-    item.body = item.body.replace(/^\/note\s*/i, "").trim();
+  if (newBody.toLowerCase().startsWith("/project")) {
+    EDITOR_ITEM.type = "project";
+    newBody = newBody.replace(/^\/project\s*/i, "").trim();
+  } else if (newBody.toLowerCase().startsWith("/task")) {
+    EDITOR_ITEM.type = "task";
+    newBody = newBody.replace(/^\/task\s*/i, "").trim();
+  } else if (newBody.toLowerCase().startsWith("/note")) {
+    EDITOR_ITEM.type = "note";
+    newBody = newBody.replace(/^\/note\s*/i, "").trim();
   }
-  
-  item.tags = extractTags(item.body);
-  item.dueAt = parseDue(item.body);
-  item.updatedAt = nowISO();
+
+  EDITOR_ITEM.body = newBody;
+  EDITOR_ITEM.tags = extractTags(newBody);
+  EDITOR_ITEM.dueAt = parseDue(newBody);
+  EDITOR_ITEM.updatedAt = nowISO();
 
   // Re-parse day if changed
-  const dayParse = parseDay(item.body);
+  const dayParse = parseDay(newBody);
   if (dayParse) {
-    item.scheduledDay = dayParse.day;
-    item.body = dayParse.text;
+    EDITOR_ITEM.scheduledDay = dayParse.day;
+    EDITOR_ITEM.scheduledDate = getDateFromDayName(dayParse.day);
+    EDITOR_ITEM.body = dayParse.text;
   }
 
   // Update title
-  const first = (item.body.split("\n")[0] || "").trim();
+  const first = (EDITOR_ITEM.body.split("\n")[0] || "").trim();
   if (first.length > 0 && first.length <= 80) {
-    item.title = first;
+    EDITOR_ITEM.title = first;
   } else if (first.length > 80) {
-    item.title = first.slice(0, 77) + "…";
+    EDITOR_ITEM.title = first.slice(0, 77) + "…";
   }
 
-  await dbPut(item);
+  await dbPut(EDITOR_ITEM);
+  closeEditor();
   await refresh();
+}
+
+async function toggleEditorDone() {
+  if (!EDITOR_ITEM) return;
+
+  EDITOR_ITEM.done = !EDITOR_ITEM.done;
+  EDITOR_ITEM.updatedAt = nowISO();
+
+  await dbPut(EDITOR_ITEM);
+  closeEditor();
+  await refresh();
+}
+
+async function deleteEditorItem() {
+  if (!EDITOR_ITEM) return;
+
+  if (confirm("Delete this item?")) {
+    await dbDelete(EDITOR_ITEM.id);
+    closeEditor();
+    await refresh();
+  }
 }
 
 // ---------- Alerts ----------
@@ -1454,6 +1486,27 @@ function wireUI() {
     if (!ok) return;
     await dbClear();
     await refresh();
+  });
+
+  // Editor modal buttons
+  $("#editorSave").addEventListener("click", saveEditor);
+  $("#editorDone").addEventListener("click", toggleEditorDone);
+  $("#editorDelete").addEventListener("click", deleteEditorItem);
+  $("#editorCancel").addEventListener("click", closeEditor);
+
+  // Close modal on overlay click
+  $("#editorModal").addEventListener("click", (e) => {
+    if (e.target.id === "editorModal") closeEditor();
+  });
+
+  // Close modal on Escape, save on Ctrl+Enter
+  $("#editorInput").addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      closeEditor();
+    } else if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+      e.preventDefault();
+      saveEditor();
+    }
   });
 }
 
