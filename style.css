@@ -228,8 +228,8 @@ body {
 }
 
 /* ========== PANEL COLOR ACCENTS ========== */
-/* Input/interactive panels - blue accent */
-.panel--filter {
+/* Search/filter panel - blue accent */
+[data-panel-id="search"] {
   border-left: 3px solid var(--hot);
 }
 
