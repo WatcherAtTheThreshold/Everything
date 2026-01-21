@@ -321,7 +321,7 @@ function getItemsForDay(dayName, dateStr, includeDone = false) {
   });
 }
 
-function getRelatedItems(project) {
+function getRelatedItems(project, includeDone = false) {
   // Get all items (notes/tasks) that share tags with this project
   if (!project.tags || project.tags.length === 0) return [];
 
@@ -330,10 +330,52 @@ function getRelatedItems(project) {
     if (item.id === project.id) return false;
     // Only include notes and tasks (not other projects)
     if (item.type === 'project') return false;
+    // Filter done items unless requested
+    if (!includeDone && item.done) return false;
     // Check if item has any matching tags
     if (!item.tags || item.tags.length === 0) return false;
     return item.tags.some(tag => project.tags.includes(tag));
   }).sort((a, b) => (b.updatedAt || "").localeCompare(a.updatedAt || ""));
+}
+
+function getProjectStats(project) {
+  // Get activity stats for a project
+  const allRelated = getRelatedItems(project, true); // Include done items
+  const activeItems = allRelated.filter(i => !i.done);
+  const doneItems = allRelated.filter(i => i.done);
+
+  // Find last update across project and related items
+  let lastUpdate = project.updatedAt;
+  for (const item of allRelated) {
+    if (item.updatedAt > lastUpdate) lastUpdate = item.updatedAt;
+  }
+
+  // Calculate relative time
+  const now = new Date();
+  const updated = new Date(lastUpdate);
+  const diffMs = now - updated;
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+  let lastUpdateText;
+  if (diffDays === 0) {
+    lastUpdateText = 'today';
+  } else if (diffDays === 1) {
+    lastUpdateText = 'yesterday';
+  } else if (diffDays < 7) {
+    lastUpdateText = `${diffDays} days ago`;
+  } else if (diffDays < 30) {
+    const weeks = Math.floor(diffDays / 7);
+    lastUpdateText = `${weeks} week${weeks > 1 ? 's' : ''} ago`;
+  } else {
+    const months = Math.floor(diffDays / 30);
+    lastUpdateText = `${months} month${months > 1 ? 's' : ''} ago`;
+  }
+
+  return {
+    active: activeItems.length,
+    done: doneItems.length,
+    lastUpdate: lastUpdateText
+  };
 }
 
 function getDateUrgency(dateStr) {
@@ -874,6 +916,7 @@ function renderProjects() {
 function renderProjectCard(project) {
   const isExpanded = EXPANDED_PROJECTS.has(project.id);
   const relatedItems = getRelatedItems(project);
+  const stats = getProjectStats(project);
 
   const wrapper = document.createElement("div");
   wrapper.className = "project-wrapper";
@@ -885,6 +928,16 @@ function renderProjectCard(project) {
   const tags = project.tags || [];
   const title = project.title || "(untitled)";
 
+  // Show full body when expanded, truncated when collapsed
+  const bodyHtml = isExpanded && project.body
+    ? `<div class="item__body item__body--full">${escapeHtml(project.body)}</div>`
+    : '';
+
+  // Activity summary when expanded
+  const summaryHtml = isExpanded
+    ? `<div class="project-summary">${stats.active} active • ${stats.done} done • Last update: ${stats.lastUpdate}</div>`
+    : '';
+
   projectCard.innerHTML = `
     <div class="item__top">
       <div class="item__title">
@@ -894,7 +947,8 @@ function renderProjectCard(project) {
       </div>
       <div class="item__meta">PROJECT</div>
     </div>
-    ${isExpanded && project.body ? `<div class="item__body">${escapeHtml(shortBody(project.body))}</div>` : ''}
+    ${bodyHtml}
+    ${summaryHtml}
     ${tags.length ? `<div class="tags">${tags.map(t => `<span class="tag">${escapeHtml(t)}</span>`).join("")}</div>` : ``}
   `;
 
@@ -921,12 +975,11 @@ function renderProjectCard(project) {
 
     const relatedHeader = document.createElement("div");
     relatedHeader.className = "project-related-header";
-    relatedHeader.textContent = `Related Items (${relatedItems.length})`;
+    relatedHeader.textContent = `Active Items (${relatedItems.length})`;
     relatedContainer.appendChild(relatedHeader);
 
     for (const item of relatedItems.slice(0, 10)) {
-      const relatedCard = renderItemCard(item, { compact: true, showDate: true });
-      relatedCard.classList.add('project-related-item');
+      const relatedCard = renderProjectItem(item, project.id);
       relatedContainer.appendChild(relatedCard);
     }
 
@@ -946,6 +999,74 @@ function renderProjectCard(project) {
   }
 
   return wrapper;
+}
+
+function renderProjectItem(item, projectId) {
+  // Render an item within a project context, with "next action" toggle
+  const el = document.createElement("div");
+  const isNext = item.isNextAction === true;
+
+  el.className = `item project-related-item ${isNext ? 'item--next' : ''}`;
+
+  const title = item.title || "(untitled)";
+  const d = new Date(item.createdAt);
+  const dateStr = d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+
+  el.innerHTML = `
+    <div class="item__top">
+      <div class="item__title">
+        <button class="next-action-btn ${isNext ? 'next-action-btn--active' : ''}" title="${isNext ? 'Remove next action' : 'Mark as next action'}">
+          ${isNext ? '★' : '☆'}
+        </button>
+        ${escapeHtml(title)}
+        ${isNext ? '<span class="next-badge">NEXT</span>' : ''}
+      </div>
+      <div class="item__meta">${dateStr}</div>
+    </div>
+  `;
+
+  // Toggle next action on star click
+  el.querySelector('.next-action-btn').addEventListener('click', async (e) => {
+    e.stopPropagation();
+    await toggleNextAction(item.id, projectId);
+  });
+
+  // Click to edit
+  el.addEventListener("click", (e) => {
+    if (!e.target.closest('.next-action-btn')) {
+      openEditor(item.id);
+    }
+  });
+
+  return el;
+}
+
+async function toggleNextAction(itemId, projectId) {
+  const item = ALL.find(i => i.id === itemId);
+  if (!item) return;
+
+  // If this item is already next, just toggle it off
+  if (item.isNextAction) {
+    item.isNextAction = false;
+  } else {
+    // Clear any existing "next" items for this project's related items
+    const project = ALL.find(i => i.id === projectId);
+    if (project) {
+      const related = getRelatedItems(project, true);
+      for (const r of related) {
+        if (r.isNextAction) {
+          r.isNextAction = false;
+          await dbPut(r);
+        }
+      }
+    }
+    // Mark this one as next
+    item.isNextAction = true;
+  }
+
+  item.updatedAt = nowISO();
+  await dbPut(item);
+  await refresh();
 }
 
 function toggleProject(projectId) {
