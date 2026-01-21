@@ -945,25 +945,29 @@ function renderProjectCard(project) {
         ${escapeHtml(title)}
         ${tags.length ? `<span class="project-tag-count">${tags.length} tag${tags.length > 1 ? 's' : ''}</span>` : ''}
       </div>
-      <div class="item__meta">PROJECT</div>
+      <div class="item__meta">
+        <button class="project-edit-btn" title="Edit project">✎</button>
+        <span>PROJECT</span>
+      </div>
     </div>
     ${bodyHtml}
     ${summaryHtml}
     ${tags.length ? `<div class="tags">${tags.map(t => `<span class="tag">${escapeHtml(t)}</span>`).join("")}</div>` : ``}
   `;
 
-  // Click on project header to toggle expand/collapse
-  projectCard.addEventListener("click", (e) => {
-    // Don't toggle if clicking on a tag
-    if (e.target.closest('.tag')) return;
-
-    toggleProject(project.id);
+  // Edit button click
+  projectCard.querySelector('.project-edit-btn').addEventListener('click', (e) => {
+    e.stopPropagation();
+    openEditor(project.id);
   });
 
-  // Right-click to edit
-  projectCard.addEventListener("contextmenu", (e) => {
-    e.preventDefault();
-    openEditor(project.id);
+  // Click on project header to toggle expand/collapse
+  projectCard.addEventListener("click", (e) => {
+    // Don't toggle if clicking on a tag or edit button
+    if (e.target.closest('.tag')) return;
+    if (e.target.closest('.project-edit-btn')) return;
+
+    toggleProject(project.id);
   });
 
   wrapper.appendChild(projectCard);
