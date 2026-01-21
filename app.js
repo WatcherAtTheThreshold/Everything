@@ -1508,9 +1508,178 @@ function wireUI() {
       saveEditor();
     }
   });
+
+  // Panel drag and drop
+  initPanelDragDrop();
+}
+
+// ---------- Panel Drag & Drop ----------
+let draggedPanel = null;
+
+function initPanelDragDrop() {
+  const panels = document.querySelectorAll('.panel[draggable="true"]');
+
+  panels.forEach(panel => {
+    // Only start drag from the header (drag handle)
+    const handle = panel.querySelector('.panel__drag-handle');
+    if (handle) {
+      handle.addEventListener('mousedown', () => {
+        panel.setAttribute('draggable', 'true');
+      });
+
+      // Prevent drag when clicking on buttons/inputs in header
+      handle.querySelectorAll('button, input').forEach(el => {
+        el.addEventListener('mousedown', (e) => {
+          e.stopPropagation();
+          panel.setAttribute('draggable', 'false');
+        });
+      });
+    }
+
+    panel.addEventListener('dragstart', handleDragStart);
+    panel.addEventListener('dragend', handleDragEnd);
+    panel.addEventListener('dragover', handleDragOver);
+    panel.addEventListener('dragenter', handleDragEnter);
+    panel.addEventListener('dragleave', handleDragLeave);
+    panel.addEventListener('drop', handleDrop);
+  });
+
+  // Also allow dropping on panes themselves (for empty areas)
+  document.querySelectorAll('.pane').forEach(pane => {
+    pane.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      pane.classList.add('drag-active');
+    });
+    pane.addEventListener('dragleave', () => {
+      pane.classList.remove('drag-active');
+    });
+    pane.addEventListener('drop', () => {
+      pane.classList.remove('drag-active');
+    });
+  });
+}
+
+function handleDragStart(e) {
+  draggedPanel = this;
+  this.classList.add('dragging');
+
+  // Set drag data
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', this.dataset.panelId);
+
+  // Add active state to parent pane
+  this.closest('.pane')?.classList.add('drag-active');
+}
+
+function handleDragEnd(e) {
+  this.classList.remove('dragging');
+  draggedPanel = null;
+
+  // Remove all drag states
+  document.querySelectorAll('.panel').forEach(p => {
+    p.classList.remove('drag-over', 'drag-over-bottom');
+  });
+  document.querySelectorAll('.pane').forEach(p => {
+    p.classList.remove('drag-active');
+  });
+}
+
+function handleDragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+
+  if (!draggedPanel || draggedPanel === this) return;
+
+  // Only allow dropping within same pane
+  const draggedPane = draggedPanel.closest('.pane');
+  const targetPane = this.closest('.pane');
+  if (draggedPane !== targetPane) return;
+
+  // Determine if dropping above or below based on mouse position
+  const rect = this.getBoundingClientRect();
+  const midpoint = rect.top + rect.height / 2;
+
+  this.classList.remove('drag-over', 'drag-over-bottom');
+  if (e.clientY < midpoint) {
+    this.classList.add('drag-over');
+  } else {
+    this.classList.add('drag-over-bottom');
+  }
+}
+
+function handleDragEnter(e) {
+  e.preventDefault();
+}
+
+function handleDragLeave(e) {
+  this.classList.remove('drag-over', 'drag-over-bottom');
+}
+
+function handleDrop(e) {
+  e.preventDefault();
+  e.stopPropagation();
+
+  if (!draggedPanel || draggedPanel === this) return;
+
+  // Only allow dropping within same pane
+  const draggedPane = draggedPanel.closest('.pane');
+  const targetPane = this.closest('.pane');
+  if (draggedPane !== targetPane) return;
+
+  // Determine position and insert
+  const rect = this.getBoundingClientRect();
+  const midpoint = rect.top + rect.height / 2;
+
+  if (e.clientY < midpoint) {
+    // Insert before
+    this.parentNode.insertBefore(draggedPanel, this);
+  } else {
+    // Insert after
+    this.parentNode.insertBefore(draggedPanel, this.nextSibling);
+  }
+
+  // Clean up classes
+  this.classList.remove('drag-over', 'drag-over-bottom');
+
+  // Save new order
+  savePanelOrder();
+}
+
+function savePanelOrder() {
+  const leftOrder = [...document.querySelectorAll('.pane--left .panel[data-panel-id]')]
+    .map(p => p.dataset.panelId);
+  const rightOrder = [...document.querySelectorAll('.pane--right .panel[data-panel-id]')]
+    .map(p => p.dataset.panelId);
+
+  localStorage.setItem('panel_order_left', JSON.stringify(leftOrder));
+  localStorage.setItem('panel_order_right', JSON.stringify(rightOrder));
+}
+
+function restorePanelOrder() {
+  const leftOrder = JSON.parse(localStorage.getItem('panel_order_left') || '[]');
+  const rightOrder = JSON.parse(localStorage.getItem('panel_order_right') || '[]');
+
+  if (leftOrder.length > 0) {
+    const leftPane = document.querySelector('.pane--left');
+    leftOrder.forEach(id => {
+      const panel = leftPane.querySelector(`[data-panel-id="${id}"]`);
+      if (panel) leftPane.appendChild(panel);
+    });
+  }
+
+  if (rightOrder.length > 0) {
+    const rightPane = document.querySelector('.pane--right');
+    rightOrder.forEach(id => {
+      const panel = rightPane.querySelector(`[data-panel-id="${id}"]`);
+      if (panel) rightPane.appendChild(panel);
+    });
+  }
 }
 
 async function boot() {
+  // Restore panel order before wiring UI
+  restorePanelOrder();
+
   wireUI();
   await refresh();
   tickClock();
