@@ -51,15 +51,6 @@ Day prefix: <code>monday:</code> <code>tue:</code> etc. • Tags: <code>#like-th
         </div>
       </section>
 
-      <!-- FILTER -->
-      <section class="panel panel--filter">
-        <div class="filter-bar">
-          <input id="filterInput" class="filter-input" placeholder="Filter by tag or text..." spellcheck="false" />
-          <button id="clearFilter" class="btn-clear" title="Clear filter">×</button>
-        </div>
-        <div id="tagChips" class="tag-chips"></div>
-      </section>
-
       <!-- THIS WEEK -->
       <section class="panel" data-panel-id="week">
         <div class="panel__head">
@@ -106,7 +97,25 @@ Day prefix: <code>monday:</code> <code>tue:</code> etc. • Tags: <code>#like-th
 
     <!-- RIGHT PANE: Awareness / Meta -->
     <div class="pane pane--right">
-      
+
+      <!-- SEARCH/FILTER -->
+      <section class="panel panel--compact panel--filter" data-panel-id="search">
+        <div class="panel__head">
+          <div class="panel__title">SEARCH</div>
+          <div class="panel__meta">
+            <button class="panel__toggle" data-panel="search" title="Collapse">▼</button>
+            <span>filter</span>
+          </div>
+        </div>
+        <div class="panel__body">
+          <div class="filter-bar">
+            <input id="filterInput" class="filter-input" placeholder="Filter by tag or text..." spellcheck="false" />
+            <button id="clearFilter" class="btn-clear" title="Clear filter">×</button>
+          </div>
+          <div id="tagChips" class="tag-chips"></div>
+        </div>
+      </section>
+
       <!-- ALERTS -->
       <section class="panel panel--compact" data-panel-id="alerts">
         <div class="panel__head">
