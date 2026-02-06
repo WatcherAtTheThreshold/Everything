@@ -1406,7 +1406,7 @@ async function exportAll() {
 
 async function exportMarkdown() {
   await refresh(); // ensure ALL is current
-  let md = `# Everything Console Export – ${new Date().toLocaleDateString()}\n\n`;
+  let md = `# Everything Project Planner Export – ${new Date().toLocaleDateString()}\n\n`;
 
   // Metadata
   md += "## Metadata\n";
@@ -1420,7 +1420,8 @@ async function exportMarkdown() {
     md += "*No projects yet*\n\n";
   } else {
     for (const p of projects) {
-      md += `### ${escapeMd(p.title)} ${p.tags?.join(" ") || ""}\n`;
+      const heading = (p.body || p.title || "(untitled)").split("\n")[0];
+      md += `### ${escapeMd(heading)} ${p.tags?.join(" ") || ""}\n`;
       md += `Last updated: ${fmt(p.updatedAt)}\n`;
       md += `${escapeMd(p.body)}\n\n`;
     }
@@ -1433,7 +1434,9 @@ async function exportMarkdown() {
     const items = ALL.filter(i => i.scheduledDay === day.name && !i.done);
     if (items.length) {
       md += `### ${day.name.charAt(0).toUpperCase() + day.name.slice(1)} (${day.display})\n`;
-      for (const i of items) md += `- [ ] ${escapeMd(i.title || i.body.slice(0,60))}\n`;
+      for (const i of items) {
+        md += `- [ ] ${escapeMd(i.body || i.title || "(untitled)")}\n`;
+      }
       md += "\n";
     }
   }
@@ -1446,7 +1449,7 @@ async function exportMarkdown() {
   } else {
     for (const n of notes) {
       const date = new Date(n.createdAt).toLocaleDateString();
-      md += `- ${date}: ${escapeMd(n.title)} ${n.tags?.join(" ") || ""}\n`;
+      md += `- ${date}: ${escapeMd(n.body || n.title || "(untitled)")} ${n.tags?.join(" ") || ""}\n`;
     }
     md += "\n";
   }
@@ -1458,11 +1461,11 @@ async function exportMarkdown() {
     md += "*No completed items yet*\n\n";
   } else {
     for (const d of done) {
-      md += `- [x] ${escapeMd(d.title || d.body.slice(0,60))} (${d.type})\n`;
+      md += `- [x] ${escapeMd(d.body || d.title || "(untitled)")} (${d.type})\n`;
     }
   }
 
-  downloadJSON(md, "everything-export.md", "text/markdown");
+  downloadJSON(md, "everything-planner-export.md", "text/markdown");
 }
 
 async function importAll(file) {
